@@ -1,4 +1,4 @@
-# Latex repo of the bacholer thesis of houw
+# Latex repo of the bacholer thesis of wuha
 
 link to latest thesis pdf [here](./output/thesis.pdf)
 
