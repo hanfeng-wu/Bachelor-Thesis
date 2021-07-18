@@ -70,14 +70,13 @@
 
 %abstract english
 
-This thesis studies the integration of perceptual loss into several models that are related to fluid simulation. We want to show that in the context of fluid simulation, the integration of some pretrained perceptual losses should outperform the traditional loss functions such as MSE. We first test out the performance of the perceptual losses in an Autoencoder network, then we look into
-\textit{Note:}
+This thesis studies the integration of perceptual loss into several models that are related to fluid simulation. Perceptual losses are used to compare high level differences, while traditional loss functions like MSE and MAE only compare the pixel level differences which is more brute force. 
 
-\textit{\textbf{1. paragraph:} What is the motivation of your thesis? Why is it interesting from a scientific point of view? Which main problem do you like to solve?}
+Now some famous perceptual loss functions like comparing the intermediate layers of pretrained vgg network already improve its performance in some image related tasks.\cite{johnson2016perceptual} We want to show that in the context of fluid simulation, the integration of some pretrained perceptual losses should also outperform the traditional loss functions.
 
-\textit{\textbf{2. paragraph:} What is the purpose of the document? What is the main content, the main contribution?}
+We tested some fluid simulation tasks in SOL\cite{um2020sol} to improve the performance of the percetual loss functions. Meanwhile we also integrate such loss functions into models like autoencoder and superresolution to compare their results with those from the same models but trained by MSE loss functions
 
-\textit{\textbf{3. paragraph:} What is your methodology? How do you proceed?}
+Finally we combined the result of SOL and superresolution model to conduct some fluid simulations at a lower cost to show the advantage of integrating perceptual losses in such tasks.
 
 \end{abstract}
 
@@ -86,6 +85,13 @@ This thesis studies the integration of perceptual loss into several models that 
 \selectlanguage{german}
 \begin{abstract}
 
+Diese Dissertation untersucht die Integration von Wahrnehmungsverlusten in verschiedene Modelle, die sich auf die Fluidsimulation beziehen. Wahrnehmungsverluste werden verwendet, um Unterschiede auf hohem Niveau zu vergleichen, während herkömmliche Verlustfunktionen wie MSE und MAE nur die Pixelniveauunterschiede vergleichen, was roher ist.
+
+Einige berühmte Wahrnehmungsverlustfunktionen wie der Vergleich der Zwischenschichten eines vortrainierten VGG-Netzwerks verbessern bereits seine Leistung bei einigen bildbezogenen Aufgaben.\cite{johnson2016perceptual} Wir wollen zeigen, dass die Integration einiger vortrainierter Wahrnehmungsverluste im Kontext der Fluidsimulation übertreffen auch die traditionellen Verlustfunktionen.
+
+Wir haben einige Fluidsimulationsaufgaben in SOL\cite{um2020sol} getestet, um die Leistung der Percetual Loss Functions zu verbessern. Inzwischen integrieren wir solche Verlustfunktionen auch in Modelle wie Autoencoder und Superresolution, um deren Ergebnisse mit denen aus den gleichen Modellen zu vergleichen, die jedoch mit MSE-Verlustfunktionen trainiert wurden
+
+Schließlich haben wir die Ergebnisse von SOL und Superauflösungsmodell kombiniert, um einige Fluidsimulationen zu geringeren Kosten durchzuführen, um den Vorteil der Integration von Wahrnehmungsverlusten in solchen Aufgaben zu zeigen.
 %abstract german
 \textit{Note: Insert the German translation of the English abstract here.}
 
@@ -102,7 +108,8 @@ This thesis studies the integration of perceptual loss into several models that 
 \clearpage
 
 \begin{acronym}
-\acro{GUI}{Graphical User Interface}
+\acro{SOL}{Solver in the Loop}
+\acro{LSIM}{Learning Similarity Metrics for Numerical Simulations}
 
 \end{acronym}
 
@@ -123,19 +130,19 @@ This thesis studies the integration of perceptual loss into several models that 
 
 \textit{Note: Introduce the topic of your thesis, e.g. with a little historical overview.}
 
-\section{Problem}
+\section{Perceptual loss functions}
 
 \textit{Note: Describe the problem that you like to address in your thesis to show the importance of your work. Focus on the negative symptoms of the currently available solution.}
 
-\section{Motivation}
+\section{Physical simulation}
 
 \textit{Note: Motivate scientifically why solving this problem is necessary. What kind of benefits do we have by solving the problem?}
 
-\section{Objectives}
+\section{Deep learning tasks}
 
 \textit{Note: Describe the research goals and/or research questions and how you address them by summarizing what you want to achieve in your thesis, e.g. developing a system and then evaluating it.}
 
-\section{Outline}
+\section{Related Work}
 
 \textit{Note: Describe the outline of your thesis}
 
@@ -144,19 +151,19 @@ This thesis studies the integration of perceptual loss into several models that 
 
 %------- chapter 2 -------
 
-\chapter{Background}
+\chapter{Perceptual Losses}
 
 \textit{Note: Describe each proven technology / concept shortly that is important to understand your thesis. Point out why it is interesting for your thesis. Make sure to incorporate references to important literature here.}
 
-\section{e.g. User Feedback}
+\section{Learning Similarity Metrics for Numerical Simulations}
 
 \textit{Note: This section would summarize the concept User Feedback using definitions, historical overviews and pointing out the most important aspects of User Feedback.}
 
-\section{e.g. Representational State Transfer}
+\section{VGG-16 loss network}
 
 \textit{Note: This section would summarize the architectural style Representational State Transfer (REST) using definitions, historical overviews and pointing out the most important aspects of the architecture.}
 
-\section{e.g. Scrum}
+\section{triditional loss function}
 
 \textit{Note: This section would summarize the agile method Scrum using definitions, historical overviews and pointing out the most important aspects of Scrum.}
 
@@ -164,131 +171,41 @@ This thesis studies the integration of perceptual loss into several models that 
 
 %------- chapter 3 -------
 
-\chapter{Related Work}
+\chapter{Datasets}
 
-\textit{Note: Describe related work regarding your topic and emphasize your (scientific) contribution in \textbf{contrast} to existing approaches / concepts / workflows. Related work is usually current research by others and you defend yourself against the statement: ``Why is your thesis relevant? The problem was already solved by XYZ.'' If you have multiple related works, use subsections to separate them.}
+\section{Autoencoder}
+
+\section{Superresolution}
+
+\section{Solver in the Loop}
+
 
 
 
 
 %------- chapter 4 -------
 
-\chapter{Requirements Analysis}
+\chapter{Tasks and Experiments Setup}
 
-\textit{Note: This chapter follows the Requirements Analysis Document Template in \cite{bruegge2004object}. 
-\textbf{Important:} Make sure that the whole chapter is independent of the chosen technology and development platform. The idea is that you illustrate concepts, taxonomies and relationships of the application domain independent of the solution domain!
-Cite \cite{simonyan2014very} several times in this chapter.}
+\section{Autoencoder}
 
-\section{Overview}
+\section{Superresolution}
 
-\textit{Note: Provide a short overview about the purpose, scope, objectives and success criteria of the system that you like to develop.}
-
-\section{Current System}
-
-\textit{Note: This section is only required if the proposed system (i.e. the system that you develop in the thesis) should replace an existing system.}
-
-\section{Proposed System}
-
-\textit{Note: If you leave out the section ``Current system'', you can rename this section into ``Requirements''.}
-
-\subsection{Functional Requirements}
-
-\textit{Note: List and describe all functional requirements of your system. Also mention requirements that you were not able to realize. The short title should be in the form ``verb objective''}
-
-\begin{itemize}
-\item [FR1] \textbf{Short Title}: Short Description.
-\item [FR2] \textbf{Short Title}: Short Description.
-\item [FR3] \textbf{Short Title}: Short Description.
-\end{itemize}
-
-\subsection{Nonfunctional Requirements}
-
-\textit{Note: List and describe all nonfunctional requirements of your system. Also mention requirements that you were not able to realize. Categorize them using the FURPS+ model described in \cite{bruegge2004object} without the category \textbf{functionality} that was already covered with the functional requirements.}
-
-\begin{itemize}
-\item [NFR1] \textbf{Category}: Short Description.
-\item [NFR2] \textbf{Category}: Short Description.
-\item [NFR3] \textbf{Category}: Short Description.
-\end{itemize}
-
-\section{System Models}
-
-\textit{Note: This section includes important system models for the requirements analysis.}
-
-\subsection{Scenarios}
-
-\textit{Note: If you do not distinguish between visionary and demo scenarios, you can remove the two subsubsections below and list all scenarios here.}
-
-\subsubsection{Visionary Scenarios}
-
-\textit{Note: Describe 1-2 visionary scenario here, i.e. a scenario that would perfectly solve your problem, even if it might not be realizable. Use our scenario description template (./tex/use-case-table.tex) in form of free text description.}
-
-\subsubsection{Demo Scenarios}
-
-\textit{Note: Describe 1-2 demo scenario here, i.e. a scenario that you can implement and demonstrate until the end of your thesis. Use our scenario description template (./tex/use-case-table.tex) in form of free text description.}
-
-\subsection{Use Case Model}
-
-\textit{Note: This subsection should contain a UML Use Case Diagram including roles and their use cases. You can use colors to indicate priorities. Think about splitting the diagram into multiple ones if you have more than 10 use cases.
-\textbf{Important:} Make sure to describe the most important use cases using the use case table template (./tex/use-case-table.tex). Also describe the rationale of the use case model, i.e. why you modeled it like you show it in the diagram.}
-
-\subsection{Analysis Object Model}
-
-\textit{Note: This subsection should contain a UML Class Diagram showing the most important objects, attributes, methods and relations of your application domain including taxonomies using specification inheritance (see \cite{bruegge2004object}). Do not insert objects, attributes or methods of the solution domain.
-\textbf{Important:} Make sure to describe the analysis object model thoroughly in the text so that readers are able to understand the diagram. Also write about the rationale how and why you modeled the concepts like this.}
-
-\subsection{Dynamic Model}
-
-\textit{Note: This subsection should contain dynamic UML diagrams. These can be a UML state diagrams, UML communication diagrams or UML activity diagrams.\textbf{Important:} Make sure to describe the diagram and its rationale in the text. \textbf{Do not use UML sequence diagrams.}}
-
-\subsection{User Interface}
-
-\textit{Note: Show mockups of the user interface of the software you develop and their connections / transitions. You can also create a storyboard. \textbf{Important:} Describe the mockups and their rationale in the text.}
+\section{Solver in the Loop}
 
 
 
 %------- chapter 5 -------
 
-\chapter{System Design}
+\chapter{Results and Analysis}
 
-\textit{Note: This chapter follows the System Design Document Template in \cite{bruegge2004object}. 
-You describe in this chapter how you map the concepts of the application domain to the solution domain. Some sections are optional, if they do not apply to your problem.
-Cite \cite{bruegge2004object} several times in this chapter.}
+\section{Comparison}
 
-\section{Overview}
+\subsection{Numerical evaluation}
 
-\textit{Note: Provide a brief overview of the software architecture and references to other chapters (e.g. requirements analysis), references to existing systems, constraints impacting the software architecture.}
+\subsection{Time cost evaluation}
 
-\section{Design Goals}
-
-\textit{Note: Derive design goals from your nonfunctional requirements, prioritize them (as they might conflict with each other) and describe the rationale of your prioritization. Any trade-offs between design goals (e.g., build vs. buy, memory space vs. response time),
-and the rationale behind the specific solution should be described in this section}
-
-\section{Subsystem Decomposition}
-
-\textit{Note: Describe the architecture of your system by decomposing it into subsystems and the services provided by each subsystem. Use UML class diagrams including packages / components for each subsystem.}
-
-\section{Hardware Software Mapping}
-
-\textit{Note: This section describes how the subsystems are mapped onto existing hardware and software components. The description is accompanied by a UML deployment diagram. The existing components are often off-the-shelf components. If the components are distributed on different nodes, the network infrastructure and the protocols are also described.}
-
-\section{Persistent Data Management}
-
-\textit{Note: Optional section that describes how data is saved over the lifetime of the system and which data. Usually this is either done by saving data in structured files or in databases. If this is applicable for the thesis, describe the approach for persisting data here and show a UML class diagram how the entity objects are mapped to persistent storage.
-It contains a rationale of the selected storage scheme, file system or database, a description of the selected database and database administration issues.}
-
-\section{Access Control}
-
-\textit{Note: Optional section describing the access control and security issues based on the nonfunctional requirements in the requirements analysis. It also describes the implementation of the access matrix based on capabilities or access control lists, the selection of  authentication mechanisms and the use of encryption algorithms.}
-
-\section{Global Software Control}
-
-\textit{Note: Optional section describing the control flow of the system, in particular, whether a monolithic, event-driven control flow or concurrent processes have been selected, how requests are initiated and specific synchronization issues}
-
-
-\section{Boundary Conditions}
-
-\textit{Note: Optional section describing the use cases how to start up the separate components of the system, how to shut them down, and what to do if a component or the system fails.}
+\section{Limitaions}
 
 
 
@@ -296,67 +213,12 @@ It contains a rationale of the selected storage scheme, file system or database,
 
 %------- chapter 6 -------
 
-\chapter{Case Study / Evaluation}
-
-\textit{Note: If you did an evaluation / case study, describe it here.}
-
-\section{Design}
-
-\textit{Note: Describe the design / methodology of the evaluation and why you did it like that. E.g. what kind of evaluation have you done (e.g. questionnaire, personal interviews, simulation, quantitative analysis of metrics, what kind of participants, what kind of questions, what was the procedure?}
-
-\section{Objectives}
-
-\textit{Note: Derive concrete objectives / hypotheses for this evaluation from the general ones in the introduction.}
-
-\section{Results}
-
-\textit{Note: Summarize the most interesting results of your evaluation (without interpretation). Additional results can be put into the appendix.}
-
-\section{Findings}
-
-\textit{Note: Interpret the results and conclude interesting findings}
-
-\section{Discussion}
-
-\textit{Note: Discuss the findings in more detail and also review possible disadvantages that you found}
-
-\section{Limitations}
-
-\textit{Note: Describe limitations and threats to validity of your evaluation, e.g. reliability, generalizability, selection bias, researcher bias}
+\chapter{Conclusion}
+\section{Future work}
+\section{Summary}
 
 
 
-%------- chapter 7 -------
-
-\chapter{Summary}
-
-\textit{Note: This chapter includes the status of your thesis, a conclusion and an outlook about future work.}
-
-\section{Status}
-
-\textit{Note: Describe honestly the achieved goals (e.g. the well implemented and tested use cases) and the open goals here. if you only have achieved goals, you did something wrong in your analysis.}
-
-\begin{itemize}
-	\item [\Circle]
-	\item [\LEFTcircle]
-	\item [\CIRCLE]
-\end{itemize}
-
-\subsection{Realized Goals}
-
-\textit{Note: Summarize the achieved goals by repeating the realized requirements or use cases stating how you realized them.}
-
-\subsection{Open Goals}
-
-\textit{Note: Summarize the open goals by repeating the open requirements or use cases and explaining why you were not able to achieve them. \textbf{Important:} It might be suspicious, if you do not have open goals. This usually indicates that you did not thoroughly analyze your problems.}
-
-\section{Conclusion}
-
-\textit{Note: Recap shortly which problem you solved in your thesis and discuss your \textbf{contributions} here.}
-
-\section{Future Work}
-
-\textit{Note: Tell us the next steps  (that you would do if you have more time. be creative, visionary and open-minded here.}
 
 
 
