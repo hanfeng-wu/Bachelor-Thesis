@@ -34,8 +34,8 @@
 \def\faculty{Informatik}
 \def\title{Perceptual Losses for Deep Learning on Fluid Simulations}		%TODO add title in English
 \def\titleGer{Perceptual Losses für Deep Learning von Flüssigkeitssimulationen}	%TODO add title in German
-\def\supervisor{Prof. Dr. Nils Thürey}
-\def\advisor{M.Sc. Georg Kohl}
+\def\supervisor{Prof.\ Dr.\  Nils Thürey}
+\def\advisor{M.Sc.\ Georg Kohl}
 \def\author{Hanfeng Wu}			%TODO add author name
 \def\date{15.09.2021}		%TODO add submission / handover date
 
@@ -128,32 +128,75 @@ Schließlich haben wir die Ergebnisse von SOL und Superauflösungsmodell kombini
 
 \chapter{Introductions}
 
-\textit{Note: Introduce the topic of your thesis, e.g. with a little historical overview.}
 
-\section{Perceptual loss functions}
+\section{Fluid simulation}
+\subsection{Navier Stokes Equation}
+The state of art Fluid simulation is based on the famous incompressible equation Navier-Stokes equation
 
-\textit{Note: Describe the problem that you like to address in your thesis to show the importance of your work. Focus on the negative symptoms of the currently available solution.}
+\begin{equation}
+\frac{\partial \vec u}{\partial t}+\vec u\cdot \nabla\vec u+\frac1\rho\nabla p = \vec g + \nu\nabla\cdot\nabla\vec{u}
+\end{equation}
 
-\section{Physical simulation}
+\begin{equation}
+{\nabla}\cdot\overrightarrow{u} = 0
+\end{equation}
 
-\textit{Note: Motivate scientifically why solving this problem is necessary. What kind of benefits do we have by solving the problem?}
+where $\nabla$ denotes the gradient, $\nabla\cdot$ denotes the Divergence, $\overrightarrow{u}$ denotes the velocity of the fluid, $t$ denotes the time step, $\rho$ denotes the density of the fluid, $p$ denotes the pressure, $\overrightarrow{g}$ denotes the gravity and $\nu$ denotes the viscosity of the fluid.
+
+The equation (1.1) is actually a transformation of the $\overrightarrow{F} = m\overrightarrow{a}$ and the equation (1.2) describes the incompressibility of the fluid.
+\subsection{Grid Stucture}
+The way of storing the velocity and the density is based on two different grid structure. We store the dencity in the center of each cell, we call it centeredgrid or scalar grid. However for storing the velocity, we sample them at the face centers of each cell\cite{doi:10.1063/1.1761178}. In such way we can more easily compute the inflow and outflow of each grid for each direction, however as a trade off, the data format would be more complex than normal centeredgrid, and we usually have to stack each verlocity array of each dimension together and also adopt them individually in some computations(e.g. computing loss function in deep learning)
+
+\begin{figure}[h]
+\centering
+\includegraphics[width=\textwidth]{Staggered.png}
+\caption{Staggered grid format}
+\end{figure}
+
+\subsection{Advection}
+With the knowledge base of the NS-equation and grid structures we now need the advection algorithm to run the simulation. We adopt the semi-lagrangian advection algorithm. In the lagrangian point of view, if we want to compute the grid value of the n+1 time step of grid position $\overrightarrow{x_G}$, we should figure out which particle actually flows to the grid $\overrightarrow{x_G}$ from time step n+1. If we name the grid position of the particle as $\overrightarrow{x_P}$, then the new particle at time step n+1 in $\overrightarrow{x_G}$ should have the same physical property as the particle at time step n in $\overrightarrow{x_P}$
+
+\begin{figure}[h]
+\centering
+\includegraphics[scale=0.5]{advection.png}
+\caption{advection}
+\end{figure}
+
+we first use the euler equation to calculate the $\overrightarrow{x_P}$ as a step before of $\overrightarrow{x_G}$
+\begin{equation}
+\vec x_P=\vec x_G-\Delta t\frac{d\vec x_G}{dt}
+\end{equation}
+
+because $\frac{d\vec x}{dt}=\vec u(\vec x)$ we have
+
+\begin{equation}
+\vec x_P=\vec x_G-\Delta t\vec u(\vec x_G)
+\end{equation}
+where $\vec u(\vec x_G)$ denotes the velocity sampled at the position $x_G$, with the advection we can update the velocity, pressure and density of the whole vector field.
 
 \section{Deep learning tasks}
 
 \textit{Note: Describe the research goals and/or research questions and how you address them by summarizing what you want to achieve in your thesis, e.g. developing a system and then evaluating it.}
 
-\section{Related Work}
+\section{Perceptual loss functions}
 
-\textit{Note: Describe the outline of your thesis}
+\textit{Note: Describe the problem that you like to address in your thesis to show the importance of your work. Focus on the negative symptoms of the currently available solution.}
 
 
+
+\chapter{Related Work}
+similar goal area methods
 
 
 %------- chapter 2 -------
 
-\chapter{Perceptual Losses}
+\chapter{Metrics and Perceptual Losses}
 
 \textit{Note: Describe each proven technology / concept shortly that is important to understand your thesis. Point out why it is interesting for your thesis. Make sure to incorporate references to important literature here.}
+
+\section{triditional loss function}
+
+\textit{Note: This section would summarize the agile method Scrum using definitions, historical overviews and pointing out the most important aspects of Scrum.}
 
 \section{Learning Similarity Metrics for Numerical Simulations}
 
@@ -163,9 +206,8 @@ Schließlich haben wir die Ergebnisse von SOL und Superauflösungsmodell kombini
 
 \textit{Note: This section would summarize the architectural style Representational State Transfer (REST) using definitions, historical overviews and pointing out the most important aspects of the architecture.}
 
-\section{triditional loss function}
+\section{Lpips}
 
-\textit{Note: This section would summarize the agile method Scrum using definitions, historical overviews and pointing out the most important aspects of Scrum.}
 
 
 
