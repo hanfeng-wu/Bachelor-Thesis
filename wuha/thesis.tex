@@ -174,9 +174,19 @@ because $\frac{d\vec x}{dt}=\vec u(\vec x)$ we have
 \end{equation}
 where $\vec u(\vec x_G)$ denotes the velocity sampled at the position $x_G$, with the advection we can update the velocity, pressure and density of the whole vector field.
 
+with all the knowledge above, we can formulate a sequence to conduct the basic fluid simulation.
+
+$\\\bullet$ start with an initial velocity field $\overrightarrow{u}^{0}$ with the property ${\nabla}\cdot\overrightarrow{u} = 0$
+$\\\bullet$ choose a time step $\Delta t$ 
+$\\\bullet$ For time step n = 0, 1, 2, ...
+\par$\bullet$  $\overrightarrow{u}^{A} = advect(\overrightarrow{u}^{n}, \overrightarrow{u}^{n}, \Delta t)$
+ \par$\bullet$  add the extra force$\overrightarrow{u}^{B} = \overrightarrow{u}^{A} + \Delta t\overrightarrow{g}$
+ \par$\bullet$  $\overrightarrow{u}^{n+1} =make\_incompressible(\Delta t, \overrightarrow{u}^{B})$
+
+
 \section{Deep learning tasks}
 
-\textit{Note: Describe the research goals and/or research questions and how you address them by summarizing what you want to achieve in your thesis, e.g. developing a system and then evaluating it.}
+There are also various ways of integrating deep learning model into the fluid simulation. 
 
 \section{Perceptual loss functions}
 
