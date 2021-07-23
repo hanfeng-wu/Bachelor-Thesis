@@ -138,12 +138,12 @@ The state of art Fluid simulation is based on the famous incompressible equation
 \end{equation}
 
 \begin{equation}
-{\nabla}\cdot\overrightarrow{u} = 0
+{\nabla}\cdot\vec{u} = 0
 \end{equation}
 
-where $\nabla$ denotes the gradient, $\nabla\cdot$ denotes the Divergence, $\overrightarrow{u}$ denotes the velocity of the fluid, $t$ denotes the time step, $\rho$ denotes the density of the fluid, $p$ denotes the pressure, $\overrightarrow{g}$ denotes the gravity and $\nu$ denotes the viscosity of the fluid.
+where $\nabla$ denotes the gradient, $\nabla\cdot$ denotes the Divergence, $\vec{u}$ denotes the velocity of the fluid, $t$ denotes the time step, $\rho$ denotes the density of the fluid, $p$ denotes the pressure, $\vec{g}$ denotes the gravity and $\nu$ denotes the viscosity of the fluid.
 
-The equation (1.1) is actually a transformation of the $\overrightarrow{F} = m\overrightarrow{a}$ and the equation (1.2) describes the incompressibility of the fluid.
+The equation (1.1) is actually a transformation of the $\vec{F} = m\vec{a}$ and the equation (1.2) describes the incompressibility of the fluid.
 \subsection{Grid Stucture}
 The way of storing the velocity and the density is based on two different grid structure. We store the dencity in the center of each cell, we call it centeredgrid or scalar grid. However for storing the velocity, we sample them at the face centers of each cell\cite{doi:10.1063/1.1761178}. In such way we can more easily compute the inflow and outflow of each grid for each direction, however as a trade off, the data format would be more complex than normal centeredgrid, and we usually have to stack each verlocity array of each dimension together and also adopt them individually in some computations(e.g. computing loss function in deep learning)
 
@@ -154,7 +154,7 @@ The way of storing the velocity and the density is based on two different grid s
 \end{figure}
 
 \subsection{Advection}
-With the knowledge base of the NS-equation and grid structures we now need the advection algorithm to run the simulation. We adopt the semi-lagrangian advection algorithm. In the lagrangian point of view, if we want to compute the grid value of the n+1 time step of grid position $\overrightarrow{x_G}$, we should figure out which particle actually flows to the grid $\overrightarrow{x_G}$ from time step n+1. If we name the grid position of the particle as $\overrightarrow{x_P}$, then the new particle at time step n+1 in $\overrightarrow{x_G}$ should have the same physical property as the particle at time step n in $\overrightarrow{x_P}$
+With the knowledge base of the NS-equation and grid structures we now need the advection algorithm to run the simulation. We adopt the semi-lagrangian advection algorithm. In the lagrangian point of view, if we want to compute the grid value of the n+1 time step of grid position $\vec{x_G}$, we should figure out which particle actually flows to the grid $\vec{x_G}$ from time step n+1. If we name the grid position of the particle as $\vec{x_P}$, then the new particle at time step n+1 in $\vec{x_G}$ should have the same physical property as the particle at time step n in $\vec{x_P}$
 
 \begin{figure}[h]
 \centering
@@ -162,7 +162,7 @@ With the knowledge base of the NS-equation and grid structures we now need the a
 \caption{advection}
 \end{figure}
 
-we first use the euler equation to calculate the $\overrightarrow{x_P}$ as a step before of $\overrightarrow{x_G}$
+we first use the euler equation to calculate the $\vec{x_P}$ as a step before of $\vec{x_G}$
 \begin{equation}
 \vec x_P=\vec x_G-\Delta t\frac{d\vec x_G}{dt}
 \end{equation}
@@ -176,21 +176,27 @@ where $\vec u(\vec x_G)$ denotes the velocity sampled at the position $x_G$, wit
 
 with all the knowledge above, we can formulate a sequence to conduct the basic fluid simulation.
 
-$\\\bullet$ start with an initial velocity field $\overrightarrow{u}^{0}$ with the property ${\nabla}\cdot\overrightarrow{u} = 0$
+$\\\bullet$ start with an initial velocity field $\vec{u}^{0}$ with the property ${\nabla}\cdot\vec{u} = 0$
 $\\\bullet$ choose a time step $\Delta t$ 
 $\\\bullet$ For time step n = 0, 1, 2, ...
-\par$\bullet$  $\overrightarrow{u}^{A} = advect(\overrightarrow{u}^{n}, \overrightarrow{u}^{n}, \Delta t)$
- \par$\bullet$  add the extra force$\overrightarrow{u}^{B} = \overrightarrow{u}^{A} + \Delta t\overrightarrow{g}$
- \par$\bullet$  $\overrightarrow{u}^{n+1} =make\_incompressible(\Delta t, \overrightarrow{u}^{B})$
+\par$\bullet$  $\vec{u}^{A} = advect(\vec{u}^{n}, \vec{u}^{n}, \Delta t)$
+ \par$\bullet$  add the extra force$\vec{u}^{B} = \vec{u}^{A} + \Delta t\vec{g}$
+ \par$\bullet$  $\vec{u}^{n+1} =make\_incompressible(\Delta t, \vec{u}^{B})$
 
 
 \section{Deep learning tasks}
-
-There are also various ways of integrating deep learning model into the fluid simulation. 
+There are also various ways of integrating deep learning models into the fluid simulation.
+\subsection{Autoencoder}
+The Autoencoder model has a bottle neck shape, which aims to produce the same output as the input. Once trained, the Autoencoder model can be saparated into two parts, namely the encoder and the decoder, which can compress the image with the encoder and later decompress the image with the decoder to its forer shape.
+\subsection{Superresolution}
+With the superresolution model, we can upscale the low-resolution images to high-resolution images, which based on that we have fed lots of similar data to the model. In this paper, we apply the Superresolution model at the end of the Solver in the Loop model in order to boost the fluid simulation while still obtain a fairly similar output.
+\subsection{Solver in the Loop}
+When we want to perform our fluid simulation on a lower-resolution domain to decrease the time cost, we always suffer from the numerical error comparing to the simulation running on the higher-resolution domain. It is reasonable because with the same initial state, the vector field on the higher domain has richer information than the one sampled in the lower domain. Dr.\ Kiwon Um\cite{um2020sol} developed a mechanisim to learn the difference between the 2 different domains to reduce the numerical error.
 
 \section{Perceptual loss functions}
+Perceptual loss functions are used when comparing two images, they are not like traditional loss functions like MSE or MAE which only computes the low level pixel differences. Perceptual losses on the other hand, are normally forward networks trained for specific tasks. For example, VGG-16 network was trained for massive image classification, and LSIM was trained on smoke and fluid simulations. When adopting those networks, we can either compute the mse loss between the intermediate layers of the trained network, or directly passing it through depending on the goal of the chosen perceptual loss network. These perceptual loss networks tries to retrieve the high level differences between the images, hence will usually have a better performance than the traditional loss functions. In a word, traditional loss functions have more general use cases, while perceptual loss functions will achieve better performance on specific tasks.
+In this paper we mainly focus on comparing the performance between traditional loss function MSE and perceptual loss functions LSIM, VGG-16 and lpips.
 
-\textit{Note: Describe the problem that you like to address in your thesis to show the importance of your work. Focus on the negative symptoms of the currently available solution.}
 
 
 
@@ -206,7 +212,7 @@ similar goal area methods
 
 \section{triditional loss function}
 
-\textit{Note: This section would summarize the agile method Scrum using definitions, historical overviews and pointing out the most important aspects of Scrum.}
+MSE(i.e. Mean Squre Error) is one of the most widely used perceptual loss functions.
 
 \section{Learning Similarity Metrics for Numerical Simulations}
 
