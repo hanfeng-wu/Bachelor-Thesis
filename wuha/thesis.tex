@@ -22,6 +22,7 @@
 \usepackage[utf8]{inputenc}
 \usepackage[capitalize, noabbrev]{cleveref}
 \usepackage{wasysym}
+\usepackage{subcaption}
 
 % Path for graphics
 \graphicspath{{figures/}}
@@ -128,7 +129,7 @@ Schließlich haben wir die Ergebnisse von SOL und Superauflösungsmodell kombini
 
 \chapter{Introductions}
 
-
+Our main purpose of this paper is to demonstrate the advantage of adopting the perceptual loss functions in various deep learning tasks on fluid simulation. We try to show statistically and perceptually that by integrating suitable perceptual loss functions in such tasks can outperform the original model trained on traditional loss functions such as MSE and MAE. In the end we will also compare the performance and outputs of running solely the simulation and the simulation combined with some deep learning models.
 \section{Fluid simulation}
 \subsection{Navier Stokes Equation}
 The state of art Fluid simulation is based on the famous incompressible equation Navier-Stokes equation
@@ -180,7 +181,7 @@ $\\\bullet$ start with an initial velocity field $\vec{u}^{0}$ with the property
 $\\\bullet$ choose a time step $\Delta t$ 
 $\\\bullet$ For time step n = 0, 1, 2, ...
 \par$\bullet$  $\vec{u}^{A} = advect(\vec{u}^{n}, \vec{u}^{n}, \Delta t)$
- \par$\bullet$  add the extra force$\vec{u}^{B} = \vec{u}^{A} + \Delta t\vec{g}$
+ \par$\bullet$  add the extra force $\vec{u}^{B} = \vec{u}^{A} + \Delta t\vec{g}$
  \par$\bullet$  $\vec{u}^{n+1} =make\_incompressible(\Delta t, \vec{u}^{B})$
 
 
@@ -208,11 +209,30 @@ similar goal area methods
 
 \chapter{Metrics and Perceptual Losses}
 
-\textit{Note: Describe each proven technology / concept shortly that is important to understand your thesis. Point out why it is interesting for your thesis. Make sure to incorporate references to important literature here.}
+In this chapter we will cover several loss functions that we adopted in this paper and briefly explain their characteristics and their drawbacks. More percise integrations and results will be convered in the chapter 5.
 
-\section{triditional loss function}
+\section{Mean Squre Error}
 
-MSE(i.e. Mean Squre Error) is one of the most widely used perceptual loss functions.
+MSE is one of the most widely used loss functions.
+\begin{equation}
+{MSE}=\frac{1}{n}\sum_{i=1}^n(Y_i-\hat{Y_i})^2
+\end{equation}
+Where ${Y}$ is the reference tensor and $\hat{Y}$ is the predicted tensor based on the trainable parameters. With this loss function being adopted, the network will try to do the gradient decent on the weights in a way that can achieve minimum square error. The optimal case is that the predicted tensor $\hat{Y}$ is exactly the same is the reference tensor ${Y}$. We can see that the core idea for the MSE is very general so that this loss function can be applied almost for any models, however the MSE loss function is not suitable for some image related tasks. If the two inputs of the MSE loss function is merely a image with its core content shifted by some pixels, the MSE will produce a very high value, which is not representitive, in another word, the MSE does not have shift or rotate invariance. 
+
+Besides, MSE computes the squre error of the two tensors, which means that MSE is also prone to the outliers, beacause when it has a very large outlier in the tensor, the result of MSE loss function will be strongly influenced, so in most image construction cases, in order to achieve a lower square error, the output will be a relative blur one compared with the original. More details will be convered in the next chapter.
+\begin{figure}
+\centering
+\begin{subfigure}{0.4\textwidth}
+  \centering
+  \includegraphics[scale=0.5]{MSEref.png}
+  \caption{ref}
+\end{subfigure}
+\begin{subfigure}{0.4\textwidth}
+  \centering
+  \includegraphics[scale=0.5]{MSEblur.png}
+  \caption{MSE output}
+\end{subfigure}
+\end{figure}
 
 \section{Learning Similarity Metrics for Numerical Simulations}
 
@@ -232,6 +252,7 @@ MSE(i.e. Mean Squre Error) is one of the most widely used perceptual loss functi
 \chapter{Datasets}
 
 \section{Autoencoder}
+
 
 \section{Superresolution}
 
