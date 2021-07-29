@@ -236,7 +236,13 @@ Besides, MSE computes the squre error of the two tensors, which means that MSE i
 
 \section{Learning Similarity Metrics for Numerical Simulations}
 
-LSiM is a neural network-based approach that computes a stable and generalizing metric. 
+LSiM\cite{kohl2020learning} is a neural network-based approach that computes a stable and generalizing metric. Due to the unreliability of the MSE loss in numerical simulation tasks, LSiM has been established. It aims to demonstrate the performance of CNN-based evaluations on numerical simulation tasks. The data used to train LSiM are generated with known partial differential equations (PDEs)
+
+\begin{figure}
+\centering
+\includegraphics[scale=0.5]{Plumes.pdf}
+\caption{Comparison}
+\end{figure}
 
 \section{VGG-16 loss network}
 
