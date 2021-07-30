@@ -1,0 +1,402 @@
+% ICML 2020 - Learning Similarity Metrics for Numerical Simulations
+
+\documentclass{article}
+
+\input{math_commands.tex} % math commands from https://github.com/goodfeli/dlbook_notation
+
+\usepackage{microtype}
+\usepackage{graphicx}
+\usepackage{subfigure}
+\usepackage{booktabs}
+
+\usepackage{multirow}
+\usepackage{multicol}
+
+\usepackage{url}
+\usepackage{doi}
+
+\usepackage{stfloats} % for two column floats at the bottom of the page
+
+\usepackage{xcolor}
+
+\newcommand{\theHalgorithm}{\arabic{algorithm}} % let hyperref and algorithmic work together better
+
+% for highlighting the best performances in result table
+\newcommand{\best}[1]{\textbf{\textcolor{green!25!black}{\underline{#1}}}}
+\newcommand{\bestErr}[1]{\textbf{\textcolor{green!25!black}{#1}}}
+\newcommand{\bad}[1]{\textit{\textcolor{red!40!black}{#1}}}
+
+%\usepackage{icml2020}
+\usepackage[accepted]{icml2020}
+
+% short form for the running title
+\icmltitlerunning{Learning Similarity Metrics for Numerical Simulations}
+
+% Ignore underfull vboxes due to different column lengths in 2 column layout
+\raggedbottom
+
+
+\begin{document}
+
+\twocolumn[
+\icmltitle{Learning Similarity Metrics for Numerical Simulations}
+
+\icmlsetsymbol{equal}{*}
+
+\begin{icmlauthorlist}
+\icmlauthor{Georg Kohl}{tum}
+\icmlauthor{Kiwon Um}{tum}
+\icmlauthor{Nils Thuerey}{tum}
+\end{icmlauthorlist}
+
+\icmlaffiliation{tum}{Department of Informatics, Technical University of Munich, Munich, Germany}
+
+\icmlcorrespondingauthor{Georg Kohl}{georg.kohl@tum.de}
+
+% keywords for PDF metadata
+\icmlkeywords{metric learning, CNNs, PDEs, numerical simulation, perceptual evaluation, physics simulation}
+
+\vskip 0.3in
+]
+
+\begin{NoHyper}
+\printAffiliationsAndNotice{}  % no need to mention equal contribution
+%\printAffiliationsAndNotice{\icmlEqualContribution} % default text for equal contributions
+\end{NoHyper}
+
+\begin{abstract}
+ We propose a neural network-based approach that computes a stable and generalizing metric (\textit{LSiM}) to compare data from a variety of numerical simulation sources. We focus on scalar time-dependent 2D data that commonly arises from motion and transport-based partial differential equations (PDEs). Our method employs a Siamese network architecture that is motivated by the mathematical properties of a metric. We leverage a controllable data generation setup with PDE solvers to create increasingly different outputs from a reference simulation in a controlled environment. A central component of our learned metric is a specialized loss function that introduces knowledge about the correlation between single data samples into the training process. To demonstrate that the proposed approach outperforms existing metrics for vector spaces and other learned, image-based metrics, we evaluate the different methods on a large range of test data. Additionally, we analyze generalization benefits of an adjustable training data difficulty and demonstrate the robustness of \textit{LSiM} via an evaluation on three real-world data sets.
+\end{abstract}
+
+
+\section{Introduction} \label{sec: intro}
+Evaluating computational tasks for complex data sets is a fundamental problem in all computational disciplines. Regular vector space metrics, such as the $L^2$ distance, were shown to be very unreliable \citep{wang2004,zhang2018},
+and the advent of deep learning techniques with convolutional neural networks (CNNs) made it possible to more reliably evaluate complex data domains such as natural images, texts \citep{benajiba2018}, or speech \citep{wang2018}.
+Our central aim is to demonstrate the usefulness of CNN-based evaluations in the context of numerical simulations. These simulations are the basis for a wide range of applications ranging from blood flow simulations to aircraft design. Specifically, we propose a novel learned simulation metric (\textit{LSiM}) that allows for a reliable similarity evaluation of simulation data.
+
+Potential applications of such a metric arise in all areas where numerical simulations are performed or similar data is gathered from observations. For example, accurate evaluations of existing and new simulation methods with respect to a known ground truth solution \citep{oberkampf2004} can be performed more reliably than with a regular vector norm. Another good example is weather data for which complex transport processes and chemical reactions make in-place comparisons with common metrics unreliable \citep{jolliffe2012}. Likewise, the long-standing, open questions of turbulence \citep{moin1998,lin1998} can benefit from improved methods for measuring the similarity and differences in data sets and observations.
+
+\begin{figure*}[ht]
+    \centering
+    \includegraphics[width=1.0\textwidth]{Images/Plumes}
+    \vspace{-0.8cm}
+    \caption{Example of field data from a fluid simulation of hot smoke with normalized distances for different metrics. Our method (\textit{LSiM}, green) approximates the ground truth distances (GT, gray) determined by the data generation method best, i.e., version (a) is closer to the ground truth data than (b). An $L^2$ metric (red) erroneously yields a reversed ordering.}
+    \label{fig: visual similarity}
+\end{figure*}
+
+In this work, we focus on field data, i.e., dense grids of scalar values, similar to images, which were generated with known partial differential equations (PDEs) in order to ensure the availability of ground truth solutions. While we focus on 2D data in the following to make comparisons with existing techniques from imaging applications possible, our approach naturally extends to higher dimensions.
+Every sample of this 2D data can be regarded a high dimensional vector, so metrics on the corresponding vector space are applicable to evaluate similarities. These metrics, in the following denoted as \emph{shallow metrics}, are typically simple, element-wise functions such as $L^1$ or $L^2$ distances. Their inherent problem is that they cannot compare structures on different scales or contextual information.
+
+Many practical problems require solutions over time and need a vast number of non-linear operations that often result in substantial changes of the solutions even for small changes of the inputs. Hence, despite being based on known, continuous formulations, these systems can be seen as \emph{chaotic}.
+We illustrate this behavior in Fig.~\ref{fig: visual similarity}, where two smoke flows are compared to a reference simulation. A single simulation parameter was varied for these examples, and a visual inspection shows that smoke plume (a) is more similar to the reference. This matches the data generation process: version (a) has a significantly smaller parameter change than (b) as shown in the inset graph on the right.
+\textit{LSiM} robustly predicts the ground truth distances while the $L^2$ metric labels plume (b) as more similar. In our work, we focus on retrieving the relative distances of simulated data sets. Thus, we do not aim for retrieving the absolute parameter change but a relative distance that preserves ordering with respect to this parameter.
+
+Using existing image metrics based on CNNs for this problem is not optimal either: natural images only cover a small fraction of the space of possible 2D data, and numerical simulation outputs are located in a fundamentally different data manifold within this space. Hence, there are crucial aspects that cannot be captured by purely learning from photographs. Furthermore, we have full control over the data generation process for simulation data. 
+As a result, we can create arbitrary amounts of training data with gradual changes and a ground truth ordering.
+With this data, we can learn a metric that is not only able to directly extract and use features but also encodes interactions between them.
+The central contributions of our work are as follows:
+\vspace{-0.2cm}
+\begin{itemize}
+    \setlength\itemsep{0.0cm}
+    \item We propose a Siamese network architecture with feature map normalization, which is able to learn a metric that generalizes well to unseen motion and transport-based simulation methods.
+    \item We propose a novel loss function that combines a correlation loss term with a mean squared error to improve the accuracy of the learned metric.
+    \item In addition, we show how a data generation approach for numerical simulations can be employed to train networks with general and robust feature extractors for metric calculations.
+\end{itemize}
+\vspace{-0.2cm}
+Our source code, data sets, and final model are available at \url{https://github.com/tum-pbs/LSIM}.
+
+
+% -----------------------------------------------------------
+
+\section{Related Work} \label{sec: related work}
+One of the earliest methods to go beyond using simple metrics based on $L^p$ norms for natural images was the structural similarity index \citep{wang2004}. Despite improvements, this method can still be considered a shallow metric.
+Over the years, multiple large databases for human evaluations of natural images were presented, for instance, CSIQ \citep{larson2010}, TID2013 \citep{ponomarenko2015}, and CID:IQ \citep{liu2014}. With this data and the discovery that CNNs can create very powerful feature extractors that are able to recognize patterns and structures, deep feature maps quickly became established as means for evaluation
+\citep{amirshahi2016, berardino2017, bosse2016, kang2014, kim2017}. Recently, these methods were improved by predicting the distribution of human evaluations instead of directly learning distance values \citep{prashnani2018, talebi2018b}. \citeauthor{zhang2018} compared different architecture and levels of supervision, and showed that metrics can be interpreted as a transfer learning approach by applying a linear weighting to the feature maps of any network architecture to form the image metric \textit{LPIPS v0.1}. Typical use cases of these image-based CNN metrics are computer vision tasks such as detail enhancement \citep{talebi2018a}, style transfer, and super-resolution \citep{johnson2016}.
+Generative adversarial networks also leverage CNN-based losses by training a discriminator network in parallel to the generation task \citep{dosovitskiy2016}.
+\vspace{-0.02cm}
+
+Siamese network architectures are known to work well for a variety of comparison tasks such as audio \citep{zhang2017}, satellite images \citep{he2019}, or the similarity of interior product designs \citep{bell2015}. Furthermore, they yield robust object trackers \citep{bertinetto2016}, algorithms for image patch matching \citep{hanif2019}, and for descriptors for fluid flow synthesis \citep{chu2017}.
+Inspired by these studies, we use a similar Siamese neural network architecture for our metric learning task.
+In contrast to other work on self-supervised learning that utilizes spatial or temporal changes to learn meaningful representations \citep{agrawal2015, wang2015}, our method does not rely on tracked keypoints in the data.
+\vspace{-0.02cm}
+
+While correlation terms have been used for learning joint representations by maximizing correlation of projected views \citep{chandar2016} and are popular for style transfer applications via the Gram matrix \citep{ruder2016},
+they were not used for learning distance metrics. As we demonstrate below, they can yield significant improvements in terms of the inferred distances.
+
+Similarity metrics for numerical simulations are a topic of ongoing investigation. A variety of specialized metrics have been proposed to overcome the limitations of $L^p$ norms, such as the displacement and amplitude score from the area of weather forecasting \citep{keil2009} as well as permutation based metrics for energy consumption forecasting \citep{haben2014}. Turbulent flows, on the other hand, are often evaluated in terms of aggregated frequency spectra \citep{pitsch2006}. Crowd-sourced evaluations based on the human visual system were also proposed to evaluate simulation methods for physics-based animation \citep{um2017} and for comparing non-oscillatory discretization schemes \citep{um2019}. 
+These results indicate that visual evaluations in the context of field data are possible and robust, but they require extensive (and potentially expensive) user studies. Additionally, our method naturally extends to higher dimensions, while human evaluations inherently rely on projections with at most two spatial and one time dimension.
+
+
+% -----------------------------------------------------------
+
+\section{Constructing a CNN-based Metric} \label{sec: lsim}
+
+\begin{figure*}[bp]
+    \centering
+    \includegraphics[width=1.0\textwidth]{Images/DistanceComputation}
+    \vspace{-0.7cm}
+    \caption{Overview of the proposed distance computation for a simplified base network that contains three layers with four feature maps each in this example. The output shape for every operation is illustrated below the transitions in orange and white. Bold operations are learned, i.e., contain weights influenced by the training process.}
+    \label{fig: distance computation}
+\end{figure*}
+
+In the following, we explain our considerations when employing CNNs as evaluation metrics. For a comparison that corresponds to our intuitive understanding of distances, an underlying \emph{metric} has to obey certain criteria. More precisely, a function $m : \sI \times \sI \to [0, \infty)$ is a metric on its input space $\sI$ if it satisfies the following properties $\forall \vx,\vy,\vz \in \sI$:
+\begin{align}
+    m(\vx,\vy) \; &\geq \; 0                && \text{non-negativity} \label{eq: NonNeg}\\
+    m(\vx,\vy) \; &= \; m(\vy,\vx)              && \text{symmetry} \label{eq: Sym}\\
+    m(\vx,\vy) \; &\leq \; m(\vx,\vz) + m(\vz,\vy)  && \text{triangle ineq.} \label{eq: TriIneq}\\
+    m(\vx,\vy) \; &= 0 \; \iff \; \vx = \vy     && \text{identity of indisc.} \label{eq: IoI}
+\end{align}
+The properties (\ref{eq: NonNeg}) and (\ref{eq: Sym}) are crucial as distances should be symmetric and have a clear lower bound. Eq.~(\ref{eq: TriIneq}) ensures that direct distances cannot be longer than a detour. Property (\ref{eq: IoI}), on the other hand, is not really useful for discrete operations as approximation errors and floating point operations can easily lead to a distance of zero for slightly different inputs. Hence, we focus on a relaxed, more meaningful definition $m(\vx,\vx) = 0 \; \forall \vx \in \sI$, which leads to a so-called \emph{pseudometric}. It allows for a distance of zero for different inputs but has to be able to spot identical inputs. 
+
+We realize these requirements for a pseudometric with an architecture that follows popular perceptual metrics such as \textit{LPIPS}: The activations of a CNN are compared in latent space, accumulated with a set of weights, and the resulting per-feature distances are aggregated to produce a final distance value. Fig.~\ref{fig: distance computation} gives a visual overview of this process.
+
+To show that the proposed Siamese architecture by construction qualifies as a pseudometric, the function 
+\begin{equation*}
+    m(\vx,\vy) \;=\; m_2( m_1(\vx), m_1(\vy) )
+\end{equation*}
+computed by our network is split into two parts: $m_1 : \sI \to \sL$ to compute the latent space embeddings $\tilde{\vx} = m_1(\vx), \tilde{\vy} = m_1(\vy)$ from each input, and $m_2 : \sL \to [0, \infty)$ to compare these points in the latent space $\sL$. We chose operations for $m_2$ such that it forms a metric $\forall \tilde{\vx}, \tilde{\vy} \in \sL$. Since $m_1$ always maps to $\sL$, this means $m$ has the properties (\ref{eq: NonNeg}), (\ref{eq: Sym}), and (\ref{eq: TriIneq}) on $\sI$ for any possible mapping $m_1$, i.e., only a metric on $\sL$ is required. To achieve property (\ref{eq: IoI}), $m_1$ would need to be injective, but the compression of typical feature extractors precludes this. However, if $m_1$ is deterministic $m(\vx, \vx) = 0 \; \forall \vx \in \sI$ is still fulfilled since identical inputs result in the same point in latent space and thus a distance of zero. More details for this proof can be found in App.~\ref{append: metric properties}.
+
+\subsection{Base Network}
+The sole purpose of the base network (Fig.~\ref{fig: distance computation}, in purple) is to extract feature maps from both inputs. The Siamese architecture implies that the weights of the base network are shared for both inputs, meaning all feature maps are comparable. We experimented with the feature extracting layers from various CNN architectures, such as AlexNet \citep{krizhevsky2017}, VGG \citep{simonyan2015}, SqueezeNet \citep{iandola2016}, and a fluid flow prediction network \citep{thuerey2018}. We considered three variants of these networks: using the original pre-trained weights, fine-tuning them, or re-training the full networks from scratch. In contrast to typical CNN tasks where only the result of the final output layer is further processed, we make use of the full range of extracted features across the layers of a CNN (see Fig.~\ref{fig: distance computation}). This implies a slightly different goal compared to regular training: while early features should be general enough to allow for extracting more complex features in deeper layers, this is not their sole purpose. Rather, features in earlier layers of the network can directly participate in the final distance calculation and can yield important cues.
+
+We achieved the best performance for our data sets using a base network architecture with five layers, similar to a reduced AlexNet, that was trained from scratch (see App.~\ref{append: base network}). This feature extractor is fully convolutional and thus allows for varying spatial input dimensions, but for comparability to other models we keep the input size constant at $224\times224$ for our evaluation. In separate tests with interpolated inputs, we found that the metric still works well for scaling factors in the range $[0.5, 2]$. 
+
+\subsection{Feature Map Normalization} \label{subsec: feature map norm}
+The goal of normalizing the feature maps (Fig.~\ref{fig: distance computation}, in red) is to transform the extracted features of each layer, which typically have very different orders of magnitude, into comparable ranges. While this task could potentially be performed by the learned weights, we found the normalization to yield improved performance in general.
+
+Let $\tG$ denote a 4\textsuperscript{th} order feature tensor with dimensions $(g_b, g_c, g_x, g_y)$ from one layer of the base network. We form a series $\tG_0, \tG_1, \dotsc$ for every possible content of this tensor across our training samples. The normalization only happens in the channel dimension, so all following operations accumulate values along the dimension of $g_c$ while keeping $g_b$, $g_x$, and $g_y$ constant, i.e., are applied independently of the batch and spatial dimensions.
+The unit length normalization proposed by \citeauthor{zhang2018}, i.e.,
+\begin{equation*}
+    \text{norm}_{\text{unit}}(\tG) = \tG \, / \left\| \tG \right\|_2,
+\end{equation*}
+only considers the current sample. In this case, $\left\| \tG \right\|_2$ is a 3\textsuperscript{rd} order tensor with the Euclidean norms of $\tG$ along the channel dimension. Effectively, this results in a cosine distance, which only measures angles of the latent space vectors. To consider the vector magnitude, the most basic idea is to use the maximum norm of other training samples, and this leads to a global unit length normalization
+\begin{equation*}
+    \text{norm}_{\text{global}}(\tG) = \tG \, / \, \text{max} \left(  \left\| \tG_0 \right\|_2,  \left\| \tG_1 \right\|_2, \dotsc  \right).
+\end{equation*}
+Now, the magnitude of the current sample can be compared to other feature vectors, but this is not robust since the largest feature vector could be an outlier with respect to the typical content.
+Instead, we individually transform each component of a feature vector with dimension $g_c$ to a standard normal distribution. This is realized by subtracting the mean and dividing by the standard deviation of all features element-wise along the channel dimension as follows:
+\begin{equation*}
+    \text{norm}_{\text{dist}}(\tG) \;=\; \frac{1}{\sqrt{g_c - 1}} \, \frac{\tG - \text{mean} \left(  \tG_0, \tG_1, \dotsc  \right)}
+    {\text{std} \left(  \tG_0, \tG_1, \dotsc  \right)}.
+\end{equation*}
+These statistics are computed via a preprocessing step over the training data and stay fixed during training, as we did not observe significant improvements with more complicated schedules such as keeping a running mean.
+The magnitude of the resulting normalized vectors follows a chi distribution with $k=g_c$ degrees of freedom, but computing its mean $\sqrt{2} \; \Gamma((k+1)/2) \;/\; \Gamma(k/2)$ is expensive\footnote{$\Gamma$ denotes the gamma function for factorials}, especially for larger $k$. Instead, the mode of the chi distribution $\sqrt{g_c - 1}$ that closely approximates its mean is employed to achieve a consistent average magnitude of about one independently of $g_c$. As a result, we can measure angles for the latent space vectors and compare their magnitude in the global length distribution across all layers.
+
+
+\subsection{Latent Space Differences} 
+Computing the difference of two latent space representations $\tilde{\vx}, \tilde{\vy} \in \sL$ that consist of all extracted features from the two inputs $\vx,\vy \in \sI$ lies at the core of the metric. This difference operator in combination with the following aggregations has to ensure that the metric properties above are upheld with respect to $\sL$. Thus, the most obvious approach to employ an element-wise difference $\tilde{\vx_i}-\tilde{\vy_i} \;\forall i \in \left\{ 0,1,\dotsc,\text{dim}(\sL) \right\}$ is not suitable, as it invalidates non-negativity and symmetry.
+Instead, exponentiation of an absolute difference via $\lvert \tilde{\vx_i}-\tilde{\vy_i} \rvert^p$ yields an $L^p$ metric on $\sL$, when combined with the correct aggregation and a $p$th root. $\lvert \tilde {\vx_i}-\tilde{\vy_i} \rvert^2$ is used to compute the difference maps (Fig.~\ref{fig: distance computation}, in yellow), as we did not observe significant differences for other values of $p$.
+
+Considering the importance of comparing the extracted features, this simple feature difference does not seem optimal. Rather, one can imagine that improvements in terms of comparing one set of feature activations could lead to overall improvements for derived metrics. We investigated replacing these operations with a pre-trained CNN-based metric for each feature map. This creates a recursive process or ``meta-metric'' that reformulates the initial problem of learning input similarities in terms of learning feature space similarities.
+However, as detailed in App.~\ref{append: meta metric}, we did not find any substantial improvements with this recursive approach. This implies that once a large enough number of expressive features is available for comparison, the in-place difference of each feature is sufficient to compare two inputs.
+
+
+\subsection{Aggregations}
+The subsequent aggregation operations (Fig.~\ref{fig: distance computation}, in green) are applied to the difference maps to compress the contained per feature differences along the different dimensions into a single distance value. 
+A simple summation in combination with an absolute difference $\lvert \tilde{\vx_i}-\tilde{\vy_i} \rvert$ above leads to an $L^1$ distance on the latent space $\sL$. Similarly, we can show that average or learned weighted average operations are applicable too (see App.~\ref{append: metric properties}). In addition, using a $p$-th power for the latent space difference requires a corresponding root operation after all aggregations, to ensure the metric properties with respect to $\sL$.
+
+To aggregate the difference maps along the channel dimension, we found the weighted average proposed by \citeauthor{zhang2018} to work very well. Thus, we use one learnable weight to control the importance of a feature. The weight is a multiplier for the corresponding difference map before summation along the channel dimension, and is clamped to be non-negative. A negative weight would mean that a larger difference in this feature produces a smaller overall distance, which is not helpful. For regularization, the learned aggregation weights utilize dropout during training, i.e., are randomly set to zero with a probability of 50\%. This ensures that the network cannot rely on single features only, but has to consider multiple features for a more stable evaluation.
+
+For spatial and layer aggregation, functions such as a summation or averaging are sufficient and generally interchangeable.
+We experimented with more intricate aggregation functions, e.g., by learning a spatial average or determining layer importance weights dynamically from the inputs. When the base network is fixed and the metric only has very few trainable weights, this did improve the overall performance. But, with a fully trained base network, the feature extraction seems to automatically adopt these aspects making a more complicated aggregation unnecessary.
+
+
+
+% -----------------------------------------------------------
+
+\section{Data Generation and Training} \label{sec: data}
+Similarity data sets for natural images typically rely on changing already existing images with distortions, noise, or other operations and assigning ground truth distances according to the strength of the operation. Since we can control the data creation process for numerical simulations directly, we can generate large amounts of simulation data with increasing dissimilarities by altering the parameters used for the simulations. 
+As a result, the data contains more information about the nature of the problem, i.e., which changes of the data distribution should lead to increased distances, than by applying modifications as a post-process.
+
+\subsection{Data Generation} 
+Given a set of model equations, e.g., a PDE from fluid dynamics, typical solution methods consist of a solver that, given a set of boundary conditions, computes discrete approximations of the necessary differential operators. The discretized operators and the boundary conditions typically contain problem dependent parameters, which we collectively denote with $p_0, p_1, \dotsc, p_i, \dotsc$ in the following. We only consider time dependent problems, and our solvers start with initial conditions at $t_0$ to compute a series of time steps $t_1, t_2, \dotsc$ until a target point in time ($t_t$) is reached. At that point, we obtain a reference output field $o_0$ from one of the PDE variables, e.g., a velocity.
+
+\begin{figure}[htb]
+    \centering
+    \includegraphics[width=0.48\textwidth]{Images/DataGeneration}
+    \vspace{-0.6cm}
+    \caption{General data generation method from a PDE solver for a time dependent problem. With increasing changes of the initial conditions for a parameter $p_i$ in $\Delta_i$ increments, the outputs decrease in similarity. Controlled Gaussian $noise$ is injected in a simulation field of the solver. The difficulty of the learning task can be controlled by scaling $\Delta_i$ as well as the noise variance $v$.
+    }
+    \label{fig: data generation}
+\end{figure}
+
+For data generation, we incrementally change a single parameter $p_i$ in $n$ steps $\Delta_i, 2 \cdot \Delta_i, \dotsc, n \cdot \Delta_i$ to create a series of $n$ outputs $o_1, o_2, \dotsc, o_n$. We consider a series obtained in this way to be increasingly different from $o_0$. To create natural variations of the resulting data distributions, we add Gaussian noise fields with zero mean and adjustable variance $v$ to an appropriate simulation field such as a velocity. This noise allows us to generate a large number of varied data samples for a single simulation parameter $p_i$. Furthermore, $v$ serves as an additional parameter that can be varied in isolation to observe the same simulation with different levels of interference. This is similar in nature to numerical errors introduced by discretization schemes.
+These perturbations enlarge the space covered by the training data, and we found that training networks with suitable noise levels improves robustness as we will demonstrate below. The process for data generation is summarized in Fig.~\ref{fig: data generation}.
+
+As PDEs can model extremely complex and chaotic behaviour, there is no guarantee that the outputs always exhibit increasing dissimilarity with the increasing parameter change. This behaviour is what makes the task of similarity assessment so challenging. Even if the solutions are essentially chaotic, their behaviour is not arbitrary but rather governed by the rules of the underlying PDE. 
+For our data set, we choose the following range of representative PDEs:
+We include a pure Advection-Diffusion model (AD), and Burger's equation (BE) which introduces an additional viscosity term. Furthermore, we use the full Navier-Stokes equations (NSE), which introduce a conservation of mass constraint. When combined with a deterministic solver and a suitable parameter step size, all these PDEs exhibit chaotic behaviour at small scales, and the medium to large scale characteristics of the solutions shift smoothly with increasing changes of the parameters $p_i$.
+
+The noise amplifies the chaotic behaviour to larger scales and provides a controlled amount of perturbations for the data generation. This lets the network learn about the nature of the chaotic behaviour of PDEs without overwhelming it with data where patterns are not observable anymore.
+The latter can easily happen when $\Delta_i$ or $v$ grow too large and produce essentially random outputs. Instead, we specifically target solutions that are difficult to evaluate in terms of a shallow metric. We heuristically select the smallest $v$ and a suitable $\Delta_i$ such that the ordering of several random output samples with respect to their $L^2$ difference drops below a correlation value of $0.8$. For the chosen PDEs, $v$ was small enough to avoid deterioration of the physical behaviour especially due to the diffusion terms, but different means of adjusting the difficulty may be necessary for other data.
+
+\subsection{Training}
+For training, the 2D scalar fields from the simulations were augmented with random flips, $90^{\circ}$ rotations, and cropping to obtain an input size of $224\times224$ every time they are used. Identical augmentations were applied to each field of one given sequence to ensure comparability. Afterwards, each input sequence is collectively normalized to the range $[0, 255]$. To allow for comparisons with image metrics and provide the possibility to compare color data and full velocity fields during inference, the metric uses three input channels. During training, the scalar fields are duplicated to each channel after augmentation.
+Unless otherwise noted, networks were trained with a batch size of 1 for 40 epochs with the Adam optimizer using a learning rate of $10^{-5}$.
+To evaluate the trained networks on validation and test inputs, only a bilinear resizing and the normalization step is applied.
+
+
+% -----------------------------------------------------------
+
+\section{Correlation Loss Function}\label{sec: loss}
+
+The central goal of our networks is to identify relative differences of input pairs produced via numerical simulations.
+Thus, instead of employing a loss that forces the network to only infer given labels or distance values,
+we train our networks to infer the ordering of a given sequence of simulation outputs $o_0, o_1, \dotsc, o_n$. 
+We propose to use the Pearson correlation coefficient \citep[see][]{pearson1920}, which yields a value in $[-1,1]$ that measures the linear relationship between two distributions. A value of $1$ implies that a linear equation describes their relationship perfectly. We compute this coefficient for a full series of outputs such that the network can learn to extract features that arrange this data series in the correct ordering.
+Each training sample of our network consists of every possible pair from the sequence $o_0, o_1, \dotsc, o_n$ and the corresponding ground truth distance distribution $\vc \in [0,1]^{0.5 (n+1) n}$ representing the parameter change from the data generation. For a distance prediction $\vd \in [0,\infty)^{0.5 (n+1) n}$ of our network for one sample, we compute the loss with:
+\begin{equation}
+    L(\vc, \vd) = \lambda_1 (\vc - \vd)^2 + \lambda_2 (1 - \frac{(\vc - \bar{\vc}) \cdot (\vd - \bar{\vd})}{\left\|\vc - \bar{\vc}\right\|_2 \left\|\vd - \bar{\vd}\right\|_2} )
+    \label{eq: training loss}
+\end{equation}
+
+Here, the mean of a distance vector is denoted by $\bar{\vc}$ and $\bar{\vd}$ for ground truth and prediction, respectively. The first part of the loss is a regular MSE term, which minimizes the difference between predicted and actual distances. The second part is the Pearson correlation coefficient, which is inverted such that the optimization results in a maximization of the correlation.
+As this formulation depends on the length of the input sequence, the two terms are scaled to adjust their relative influence with $\lambda_1$ and $\lambda_2$. For the training, we chose $n=10$ variations for each reference simulation. If $n$ should vary during training, the influence of both terms needs to be adjusted accordingly. We found that scaling both terms to a similar order of magnitude worked best in our experiments.
+
+
+\begin{figure}[ht]
+    \centering
+    \includegraphics[width=0.48\textwidth]{Images/CorrelationLoss}
+    \vspace{-0.7cm}
+    \caption{Performance comparison on our test data of the proposed approach (\textit{LSiM}) and a smaller model (\textit{AlexNet\textsubscript{frozen}}) for different loss functions on the y-axis.}
+    \label{fig: correlation loss}
+\end{figure}
+
+In Fig.~\ref{fig: correlation loss}, we investigate how the proposed loss function compares to other commonly used loss formulations for our full network and a pre-trained network, where only aggregation weights are learned. The performance is measured via Spearman's rank correlation of predicted against ground truth distances on our combined test data sets. This is comparable to the \texttt{All} column in Tab.~\ref{table: results} and described in more detail in Section \ref{subsec: evaluation}. In addition to our full loss function, we consider a loss function that replaces the Pearson correlation with a simpler cross-correlation $(\vc \cdot \vd) \,/\, (\left\|\vc\right\|_2 \left\|\vd\right\|_2)$. We also include networks trained with only the MSE or only the correlation terms for each of the two variants.
+
+A simple MSE loss yields the worst performance for both evaluated models. Using any correlation based loss function for the \textit{AlexNet\textsubscript{frozen}} metric (see Section \ref{subsec: evaluation}) improves the results, but there is no major difference due to the limited number of only 1152 trainable weights. For \textit{LSiM}, the proposed combination of MSE loss with the Pearson correlation performs better than using cross-correlation or only isolated Pearson correlation.
+Interestingly, combining cross correlation with MSE yields worse results than cross correlation by itself. 
+This is caused by the cross correlation term influencing absolute distance values, which potentially conflicts with the MSE term.
+For our loss, the Pearson correlation only handles the relative ordering while the MSE deals with the absolute distances, leading to better inferred distances.
+
+
+% -----------------------------------------------------------
+
+\section{Results} \label{sec: results}
+In the following, we will discuss how the data generation approach was employed to create a large range of training and test data from different PDEs. Afterwards, the proposed metric is compared to other metrics, and its robustness is evaluated with several external data sets.
+
+\begin{figure*}[bp]
+    \centering
+    \vspace{-0.2cm}
+    \includegraphics[width=0.99\textwidth]{Images/DataExamples_small}
+    \vspace{-0.35cm}
+    \caption{Samples from our data sets. For each subset the reference is on the left, and three variations in equal parameter steps follow. From left to right and top to bottom: \texttt{Smo} (density, velocity, and pressure), \texttt{Adv} (density), \texttt{Liq} (flags, velocity, and levelset), \texttt{Bur} (velocity), \texttt{LiqN} (velocity), \texttt{AdvD} (density), \texttt{Sha} and \texttt{Vid}.}
+    \label{fig: data examples}
+\end{figure*}
+
+\subsection{Data Sets}
+We created four training (\texttt{Smo}, \texttt{Liq}, \texttt{Adv} and \texttt{Bur}) and two test data sets (\texttt{LiqN} and \texttt{AdvD}) with ten parameter steps for each reference simulation. Based on two 2D NSE solvers, the smoke and liquid simulation training sets (\texttt{Smo} and \texttt{Liq}) add noise to the velocity field and feature varied initial conditions such as fluid position or obstacle properties, in addition to variations of buoyancy and gravity forces. 
+The two other training sets (\texttt{Adv} and \texttt{Bur}) are based on 1D solvers for AD and BE, concatenated over time to form a 2D result. In both cases, noise was injected into the velocity field, and the varied parameters are changes to the field initialization and forcing functions. 
+
+For the test data set, we substantially change the data distribution by injecting noise into the density instead of the velocity field for AD simulations to obtain the \texttt{AdvD} data set and by including background noise for the velocity field of a liquid simulation (\texttt{LiqN}). In addition, we employed three more test sets (\texttt{Sha}, \texttt{Vid}, and \texttt{TID}) created without PDE models to explore the generalization for data far from our training data setup.
+We include a shape data set (\texttt{Sha}) that features multiple randomized moving rigid shapes, a video data set (\texttt{Vid}) consisting of frames from random video footage, and TID2013 \citep{ponomarenko2015} as a perceptual image data set (\texttt{TID}).
+Below, we additionally list a combined correlation score (\texttt{All}) for all test sets apart from \texttt{TID}, which is excluded due to its different structure. Examples for each data set are shown in Fig.~\ref{fig: data examples} and generation details with further samples can be found in App.~\ref{append: data sets}. 
+
+
+\subsection{Performance Evaluation} \label{subsec: evaluation}
+To evaluate the performance of a metric on a data set, we first compute the distances from each reference simulation to all corresponding variations. Then, the predicted and the ground truth distance distributions over all samples are combined and compared using Spearman's rank correlation coefficient \citep[see][]{spearman1904}. It is similar to the Pearson correlation, but instead it uses ranking variables, i.e., measures monotonic relationships of distributions.
+
+\begin{table*}[tp]
+    %\small
+    \vspace{-0.2cm}
+    \caption{Performance comparison of existing metrics (top block), experimental designs (middle block), and variants of the proposed method (bottom block) on validation and test data sets measured in terms of Spearman's rank correlation coefficient of ground truth against predicted distances. \best{Bold+underlined} values show the best performing metric for each data set, \bestErr{bold} values are within a $0.01$ error margin of the best performing, and \bad{italic} values are $0.2$ or more below the best performing. On the right, a visualization of the combined test data results is shown for selected models.}
+    \label{table: results}
+    \centering
+    \begin{tabular}[b]{l c c c c | c | c c c c c}
+        \toprule
+        \multirow{2}{*}[-1.3mm]{\bf Metric} & \multicolumn{4}{c |}{\bf Validation data sets} & \multicolumn{6}{c}{\bf Test data sets} \\
+        \cmidrule(lr){2-5} \cmidrule(lr){6-11}
+        & \texttt{Smo} & \texttt{Liq} & \texttt{Adv} & \texttt{Bur} & \texttt{TID} & \texttt{LiqN} & \texttt{AdvD} & \texttt{Sha} & \texttt{Vid} & \texttt{All}\\
+        \cmidrule(lr){1-11}
+
+        \it $L^2$                             & 0.66 & 0.80 & 0.74 & 0.62  & 0.82 & 0.73 & 0.57 & \bad{0.58} & 0.79 & 0.61 \\
+        \it SSIM                              & 0.69 & 0.73 & 0.77 & 0.71  & 0.77 & \bad{0.26} & \best{0.69} & \bad{0.46} & 0.75 & \bad{0.53} \\
+        \it LPIPS v0.1.                       & 0.63 & 0.68 & 0.68 & 0.72  & \best{0.86} & \bad{0.50} & 0.62 & 0.84 & \bestErr{0.83} & 0.66 \\
+        \cmidrule(lr){2-11}
+
+        \it AlexNet\textsubscript{random}     & 0.63 & 0.69 & 0.69 & 0.66  & 0.82 & 0.64 & 0.65 & \bad{0.67} & 0.81 & 0.65 \\
+        \it AlexNet\textsubscript{frozen}     & 0.66 & 0.70 & 0.69 & 0.71  & \bestErr{0.85} & \bad{0.40} & 0.62 & 0.87 & \best{0.84} & 0.65 \\
+        \it Optical flow                      & 0.62 & \bad{0.57} & \bad{0.36} & \bad{0.37}  & \bad{0.55} & \bad{0.49} & \bad{0.28} & \bad{0.61} & 0.75 & \bad{0.48} \\
+        \it Non-Siamese                       & 0.77 & \best{0.85} & 0.78 & \bestErr{0.74}  & \bad{0.65} & \best{0.81} & 0.64 & \bad{0.25} & 0.80 & 0.60 \\
+        \it Skip\textsubscript{from scratch}  & \best{0.79} & 0.83 & \best{0.80} & \bestErr{0.74}  & \bestErr{0.85} & 0.78 & 0.61 & 0.78 & \bestErr{0.83} & 0.71 \\
+        \cmidrule(lr){2-11}
+        
+        \it LSiM\textsubscript{noiseless}     & 0.77 & 0.77 & 0.76 & 0.72  & \bestErr{0.85} & 0.62 & 0.58 & 0.86 & 0.82 & 0.68 \\
+        \it LSiM\textsubscript{strong noise}  & 0.65 & \bad{0.65} & 0.67 & 0.69  & 0.84 & \bad{0.39} & 0.54 & \best{0.89} & 0.82 & 0.64 \\
+        \it LSiM (ours)                       & \bestErr{0.78} & 0.82 & \bestErr{0.79} & \best{0.75}  & \bestErr{0.86} & 0.79 & 0.58 & \bestErr{0.88} & 0.81 & \best{0.73} \\
+   
+        \bottomrule
+    \end{tabular}
+    \hspace{-0.0cm}
+    \includegraphics[width=0.187\textwidth]{Images/PerformanceAll}
+    %\includegraphics[width=0.16\textwidth]{Images/PerformanceAll} %for small
+\end{table*}
+
+The top part of Tab.~\ref{table: results} shows the performance of the shallow metrics \textit{$L^2$} and \textit{SSIM} as well as the \textit{LPIPS} metric \citep{zhang2018} for all our data sets. The results clearly show that shallow metrics are not suitable to compare the samples in our data set and only rarely achieve good correlation values. The perceptual \textit{LPIPS} metric performs better in general and outperforms our method on the image data sets \texttt{Vid} and \texttt{TID}. This is not surprising as \textit{LPIPS} is specifically trained for such images. For most of the simulation data sets, however, it performs significantly worse than for the image content. The last row of Tab.~\ref{table: results} shows the results of our \textit{LSiM} model with a very good performance across all data sets and no negative outliers. Note that although it was not trained with any natural image content, it still performs well for the image test sets.
+
+The middle block of Tab.~\ref{table: results} contains several interesting variants (more details can be found in App.~\ref{append: architectures}):
+\textit{AlexNet\textsubscript{random}} and \textit{AlexNet\textsubscript{frozen}} are small models, where the base network is the original AlexNet with pre-trained weights. \textit{AlexNet\textsubscript{random}} contains purely random aggregation weights without training, whereas \textit{AlexNet\textsubscript{frozen}} only has trainable weights for the channel aggregation and therefore lacks the flexibility to fully adjust to the data distribution of the numerical simulations. The random model performs surprisingly well in general, pointing to powers of the underlying Siamese CNN architecture.
+
+Recognizing that many PDEs include transport phenomena, we investigated optical flow \citep{horn1981} as a means to compute motion from field data. For the \textit{Optical flow} metric, we used FlowNet2 \citep{ilg2016} to bidirectionally compute the optical flow field between two inputs and aggregate it to a single distance value by summing all flow vector magnitudes. On the data set \texttt{Vid} that is similar to the training data of FlowNet2, it performs relatively well, but in most other cases it performs poorly. This shows that computing a simple warping from one input to the other is not enough for a stable metric although it seems like an intuitive solution. A more robust metric needs the knowledge of the underlying features and their changes to generalize better to new data. 
+
+To evaluate whether a Siamese architecture is really beneficial, we used a \textit{Non-Siamese} architecture that directly predicts the distance from both stacked inputs. For this purpose, we employed a modified version of AlexNet that reduces the weights of the feature extractor by 50\% and of the remaining layers by 90\%. As expected, this metric works great on the validation data but has huge problems with generalization, especially on \texttt{TID} and \texttt{Sha}. In addition, even simple metric properties such as symmetry are no longer guaranteed because this architecture does not have the inherent constraints of the Siamese setup. 
+Finally, we experimented with multiple fully trained base networks. As re-training existing feature extractors only provided small improvements, we used a custom base network with skip connections for the \textit{Skip\textsubscript{from scratch}} metric. Its results already come close to the proposed approach on most data sets.
+
+The last block in Tab.~\ref{table: results} shows variants of the proposed approach trained with varied noise levels. This inherently changes the difficulty of the data. Hence, \textit{LSiM\textsubscript{noiseless}} was trained with relatively simple data without perturbations, whereas \textit{LSiM\textsubscript{strong noise}} was trained with strongly varying data. Both cases decrease the capabilities of the trained model on some of the validation and test sets. This indicates that the network needs to see a certain amount of variation at training time in order to become robust, but overly large changes hinder the learning of useful features (also see App.~\ref{append: noise}). 
+
+
+\subsection{Evaluation on Real-World Data} \label{subsec: real-world evaluation}
+
+\begin{figure*}[tp]
+    \centering
+    \includegraphics[width=1.0\textwidth]{Images/RealWorldData_small}
+    \vspace{-0.5cm}
+    \caption{Examples from three real-world data repositories used for evaluation, visualized via color-mapping. Each block features four different sequences (rows) with frames in equal temporal or spatial intervals. Left: \textit{ScalarFlow} -- captured buoyant volumetric transport flows using the z-slice (top two) and z-mean (bottom two). Middle: \textit{JHTDB} -- four different turbulent DNS simulations. Right: \textit{WeatherBench} -- weather data consisting of temperature (top two) and geopotential (bottom two).} \label{fig: real world data}
+\end{figure*}
+
+To evaluate the generalizing capabilities of our trained metric, we turn to three representative and publicly available data sets of captured and simulated real-world phenomena, namely buoyant flows, turbulence, and weather. For the former, we make use of the \textit{ScalarFlow} data set \citep{eckert2019}, which consists of captured velocities of buoyant scalar transport flows.
+Additionally, we include velocity data from the Johns Hopkins Turbulence Database (\textit{JHTDB}) \citep{perlman2007}, which represents direct numerical simulations of fully developed turbulence. As a third case, we use scalar temperature and geopotential fields from the \textit{WeatherBench} repository \citep{rasp2020}, which contains global climate data on a Cartesian latitude-longitude grid of the earth. Visualizations of this data via color-mapping the scalar fields or velocity magnitudes are shown in Fig.~\ref{fig: real world data}.
+
+\begin{figure}[ht]
+    \centering
+    \vspace{-0.1cm}
+    \includegraphics[width=0.48\textwidth]{Images/RealWorldEvaluation.pdf}
+    \vspace{-0.9cm}
+    \caption{Spearman correlation values for multiple metrics on data from three repositories. Shown are mean and standard deviation over different temporal or spatial intervals used to create sequences.} \label{fig: real world evaluation}
+\end{figure}
+
+For the results in Fig.~\ref{fig: real world evaluation}, we extracted sequences of frames with fixed temporal and spatial intervals from each data set to obtain a ground truth ordering. Six different interval spacings for every data source are employed, and all velocity data is split by component. We then measure how well different metrics recover the original ordering in the presence of the complex changes of content, driven by the underlying physical processes. The \textit{LSiM} model outlined in previous sections was used for inference without further changes.
+
+Every metric is separately evaluated (see Section \ref{subsec: evaluation}) for the six interval spacings with 180-240 sequences each. For \textit{ScalarFlow} and \textit{WeatherBench}, the data was additionally partitioned by z-slice or z-mean and temperature or geopotential respectively, leading to twelve evaluations. Fig.~\ref{fig: real world evaluation} shows the mean and standard deviation of the resulting correlation values.
+Despite never being trained on any data from these data sets, \textit{LSiM} recovers the ordering of all three cases with consistently high accuracy. It yields averaged correlations of $0.96 \pm 0.02$, $0.95 \pm 0.05$, and $0.95 \pm 0.06$ for \textit{ScalarFlow}, \textit{JHTDB}, and \textit{WeatherBench}, respectively. The other metrics show lower means and higher uncertainty. Further details and results for the individual evaluations can be found in App.~\ref{append: real-world data}.
+
+
+% -----------------------------------------------------------
+
+\section{Conclusion} \label{sec: conclusion}
+We have presented the \textit{LSiM} metric to reliably and robustly compare outputs from numerical simulations. Our method significantly outperforms existing shallow metric functions and provides better results than other learned metrics. We demonstrated the usefulness of the correlation loss, showed the benefits of a controlled data generation environment, and highlighted the stability of the obtained metric for a range of real-world data sets. 
+
+Our trained \textit{LSiM} metric has the potential to impact a wide range of fields, including the fast and reliable accuracy assessment of new simulation methods, robust optimizations of parameters for reconstructions of observations, and guiding generative models of physical systems.
+Furthermore, it will be highly interesting to evaluate other loss functions, e.g., mutual information \citep{bachman2019} or contrastive predictive coding \citep{henaff2019}, and combinations with evaluations from perceptual studies \citep{um2019}. We also plan to evaluate our approach for an even larger set of PDEs as well as for 3D and 4D data sets.
+Especially, turbulent flows are a highly relevant and interesting area for future work on learned evaluation metrics. 
+
+
+% acknowledgements should only appear in the accepted version
+\section*{Acknowledgements}
+This work was supported by the ERC Starting Grant \textit{realFlow} (StG-2015-637014). We would like to thank Stephan Rasp for preparing the \textit{WeatherBench} data and all reviewers for helping to improve this work.
+
+\hbadness=99999 %ignore underful hboxes in bibliography
+
+{
+\small
+\bibliography{bibliography}
+\bibliographystyle{icml2020}
+}
+
+\newpage
+
+\appendix
+\input{appendix}
+
+\end{document}
+
