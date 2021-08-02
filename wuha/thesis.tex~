@@ -1,5 +1,5 @@
 \documentclass[a4paper,12pt,twoside]{report}
-
+\input{math_commands.tex} % math commands from https://github.com/goodfeli/dlbook_notation
 \usepackage{acronym}
 \usepackage{url}
 \usepackage{cite}
@@ -20,8 +20,10 @@
 \usepackage{array}
 \usepackage{longtable}
 \usepackage[utf8]{inputenc}
-\usepackage[capitalize, noabbrev]{cleveref}
 \usepackage{wasysym}
+\usepackage[capitalize, noabbrev]{cleveref}
+
+
 \usepackage{subcaption}
 
 % Path for graphics
@@ -236,17 +238,39 @@ Besides, MSE computes the squre error of the two tensors, which means that MSE i
 
 \section{Learning Similarity Metrics for Numerical Simulations}
 
-LSiM \cite{kohl2020learning} is a neural network-based approach that computes a stable and generalizing metric. Due to the unreliability of the MSE loss in numerical simulation tasks, LSiM has been established. It aims to demonstrate the performance of CNN-based evaluations on numerical simulation tasks. The data used to train LSiM are generated with known partial differential equations (PDEs)
+LSiM \cite{kohl2020learning} is a neural network-based approach that computes a stable and generalizing metric. Due to the unreliability of the MSE loss in numerical simulation tasks, LSiM has been established. It aims to demonstrate the performance of CNN-based evaluations on numerical simulation tasks. The data used to train LSiM are generated with known partial differential equations (PDEs). 
+
+With figure 3.2, we can tell that the $L^2$ loss function consider plume b a closer image to the reference, while the fact is that plume a has a smaller distance to the reference image, which is exactly predicted by the LSiM.
 
 \begin{figure}
 \centering
-\includegraphics[scale=0.5]{Plumes.pdf}
-\caption{Comparison}
+\includegraphics[width=1.0\textwidth]{Plumes.pdf}
+\caption{The loss computed between two different plume images and the reference with LSiM and $L^2$ metrics. While the GT is the ground truth distance determined by the data generation.  }
 \end{figure}
+The LSiM itself is also a CNN-based metric, see figure 3.3. The input of the network must be two batches of images with 3 channels
+\begin{figure}
+\centering
+\includegraphics[width=1.0\textwidth]{DistanceComputation.pdf}
+\caption{The Network structure of LSiM}
+\end{figure}
+
+As a metric, it also holds the metric properties $\forall \vx,\vy,\vz \in \sI$:
+\begin{align}
+    m(\vx,\vy) \; &\geq \; 0                && \text{non-negativity} \label{eq: NonNeg}\\
+    m(\vx,\vy) \; &= \; m(\vy,\vx)              && \text{symmetry} \label{eq: Sym}\\
+    m(\vx,\vy) \; &\leq \; m(\vx,\vz) + m(\vz,\vy)  && \text{triangle ineq.} \label{eq: TriIneq}\\
+    m(\vx,\vy) \; &= 0 \; \iff \; \vx = \vy     && \text{identity of indisc.} \label{eq: IoI}
+\end{align}
 
 \section{VGG-16 loss network}
 
-\textit{Note: This section would summarize the architectural style Representational State Transfer (REST) using definitions, historical overviews and pointing out the most important aspects of the architecture.}
+VGG-16\cite{simonyan2014very} is originally a CNN-based network trained for image classification problems. The author proposed 6 versions of vgg networks with different numbers of CNN layers but applied 3 fully connected layers for all of them at the end to realize the classification functionality. We adopted in the paper only the pretrained vgg-16 networks and apply it as a perceptual loss function. Since the networks was not originally trained for computing the distance, we can still use transfer learning to use it as a percetual loss. In the paper\cite{johnson2016perceptual}, they chose to extract the third intermediate layer outputs and compute the MSE loss between them to realize the perceptual loss functionality(shown in figure 3.4)
+
+\begin{figure}
+\centering
+\includegraphics[width=1.0\textwidth]{SystemFigure.pdf}
+\caption{The system figure of their style transfer learning, we only focus on how they compute the loss function based on the vgg-16 network}
+\end{figure}
 
 \section{Lpips}
 
@@ -325,4 +349,4 @@ LSiM \cite{kohl2020learning} is a neural network-based approach that computes a 
 \bibliography{thesis}
 \bibliographystyle{alpha}
 
-\end{document}
+\end{document}ison
