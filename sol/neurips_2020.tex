@@ -1,0 +1,90 @@
+\pdfoutput=1                    % tell arxiv to use pdflatex
+\documentclass{article}
+
+% ready for submission
+% \usepackage{neurips_2020}
+
+% to compile a preprint version, e.g., for submission to arXiv, add the
+% [preprint] option:
+%\usepackage[preprint]{neurips_2020}
+
+% to compile a camera-ready version, add the [final] option, e.g.:
+\usepackage[final,nonatbib]{neurips_2020}
+
+% to avoid loading the natbib package, add option nonatbib:
+% \usepackage[nonatbib]{neurips_2020}
+
+\usepackage[utf8]{inputenc} % allow utf-8 input
+\usepackage[T1]{fontenc}    % use 8-bit T1 fonts
+\usepackage{hyperref}       % hyperlinks
+\usepackage{url}            % simple URL typesetting
+\usepackage{booktabs}       % professional-quality tables
+\usepackage{amsfonts}       % blackboard math symbols
+\usepackage{nicefrac}       % compact symbols for 1/2, etc.
+\usepackage{microtype}      % microtypography
+\usepackage{enumitem}
+
+
+\input{math_commands.inc}
+\input{incMine.inc}
+\usepackage{url}
+\def\UrlBreaks{\do\/\do-}
+\usepackage{breakurl}
+%\usepackage[breaklinks]{hyperref}
+\usepackage{amsmath}
+\usepackage{subcaption}
+\usepackage{graphicx}
+\usepackage{placeins}
+\usepackage{wrapfig}
+\captionsetup[subfigure]{aboveskip=1pt,belowskip=4pt}
+\usepackage{mathrsfs}
+\usepackage{overpic}
+
+\input{sep_meta.inc}
+
+\begin{document}
+
+\maketitle
+
+% info box for header
+
+\vspace{-3pt}
+\vbox{%
+	\centering {\small
+  $^{1}$Technical University of Munich;
+  $^{2}$LTCI, Telecom Paris, IP Paris;
+  $^{3}$Columbia University } \\
+  \vspace{4pt}
+	\tt\href{https://github.com/tum-pbs/Solver-in-the-Loop}{github.com/tum-pbs/Solver-in-the-Loop}
+}
+\vspace{12pt}
+
+\input{sep_main.inc}
+
+% \small
+\bibliography{references}
+\bibliographystyle{abbrv}
+
+\clearpage
+\appendix
+
+% re-create NeurIPS style a bit...
+\newcommand{\mytoptitlebar}{
+  \hrule height 2pt
+  \vskip 0.25in
+  \vskip -\parskip%
+}
+\newcommand{\mybottomtitlebar}{
+  \vskip 0.29in
+  \vskip -\parskip
+  \hrule height 1pt
+  \vskip 0.09in%
+}
+\mytoptitlebar
+{\centering
+{\Large Appendix for \emph{\mytitle} \par}}
+\mybottomtitlebar
+
+\input{sep_appx.inc}
+
+\end{document}
