@@ -370,11 +370,16 @@ The training network we used is called MarsMoon, which is the same network that 
 \subsection{Applying loss functions}
 In order to compute the loss we have to define the reference and the model output. We know our model output is the correction, however it is unreasonable to directly compare the correction with the reference simulation. So the two inputs of the loss functions should be 
 
-1. The sum between the verlocity tensor on the lower-domain simulation and our trained correction .
+1. $V$: The sum between the verlocity tensor on the lower-domain simulation and our trained correction .
 
-2. The downsampled verlocity tensor from the higher-domain simulation. 
+2. $\hat{V}$: The downsampled verlocity tensor from the higher-domain simulation.
 
-For the MSE loss, which is exactly used by Prof. Um in his project, we can simply compute their pixel wise square difference and compute their mean. This traditional loss function does rely on the structure of the tensor as long as they share the same shape. So the MSE loss between two staggered tensors can be esaily computed. However the perceptual loss function has some demands on our tensor shape.
+For the MSE loss, which is exactly used by Prof. Um in his project, we can simply calculate their pixel wise square difference and compute their mean. This traditional loss function does not rely on the structure of the tensor as long as they share the same shape. So the MSE loss between two staggered tensors can be esaily computed. However the perceptual loss function has some demands on our tensor shape due to its CNN structure. For example, LSiM requires that the input tensor should consist of 3 channels to represent the RBG channels, while the size of the input tensor should be large enough to pass through several conv-layers. In our case, the output of the model is a staggered tensor with 2 channels which respectively represent x and y directions. Our solution is, that we compute the loss over each direction separately and sum them up. We firstly both extract the x direction tensor $X$ and y direction tensor $Y$ from our model output $V$, then we also extract the x direction tensor $\hat{X}$ and y direction tensor $\hat{Y}$ from the reference verlocity tensor $\hat{V}$. Our final loss function representation looks like:
+\begin{equation}
+ Loss(V, \hat{V}) = F(X, \hat{X}) + F(Y, \hat{Y})
+\end{equation}
+where F is the respective perceptual loss function. In this way, we are able to treat the verlocity tensor on each direction as an image(or triplicate the channel to RBG image) and compare with their ground truth.
+
 
 
 
