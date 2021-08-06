@@ -402,6 +402,7 @@ In karman flow simulation, we choose not to use the whole training set to train 
 \end{subfigure}
 \caption{Padding plume image to match the input size of LSiM model}
 \end{figure}
+For the buoyancy driven flow simulation, it only consists of 250 steps and each step has rich numerical information, so we regard the whole simulation as the training set. Besides, since the buoyancy simulation on the lower domain already has the shape of 64*64 we don't need to add extra padding to suit the LSiM model.
 
 
 \subsection{Applying loss functions}
