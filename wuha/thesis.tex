@@ -313,6 +313,9 @@ The data we used in the superresolution task came from various sources. We first
 \caption{Training set of LSiM model}
 \end{figure}
 
+As we also want to test the performance of combining Solver in the loop and superresolution together to compete against the time cost with performing the simulation purely on the higher domain, we therefore also feed the training data of the Solver in the Loop to the superresolution model, so that our model can learn to super sampling the plume density images when we feed the corrected simulation images on the lower domain, and we are able to abtain the plume images with the same resolution as the higher domain.
+
+Apart from that, we also test the our model performance on some random videos data which are not related to numerical simulations but still can be of some assistance to our model.
 \section{Solver in the Loop}
 \subsection{Simulation tasks}
 In the solver in the loop tasks, we have trained and tested out our model with 2 different fluid simulations, which are the 2-D karman flow and 2-D buoyancy driven flow. The author of the solver in the loop has mainly trained their model on the karmanflow, based on which we extend the model to a more complex simulation i.e. the buoyancy driven flow. 
@@ -371,6 +374,8 @@ For both tasks, we have a total of 8 simulations with their renolds numbers rang
 
 \section{Superresolution}
 
+\subsection{Network}
+We adopt the same ImageTranformNetwork as in the paper \cite{johnson2016perceptual}, which is a fully convolutional network that has the same output tensor as the input. The network consists of three Convlayers, three UpsampleConvlayers and five residual blocks.(Notice that we do not use the deconvolutinal layer in the UpsampleConvlayers as suggested in the paper\cite{odena2016deconvolution}, that deconvolutional layers will likely result into checkerboards artifacts due to the overlapping when doing the reverse convolution operations. So we prefer to fistly do the traditional upsampling either with Nearest-neighbor interpolation or with Bilinear interpolation then we apply the convlayer afterwards to obtain the expected upsampled size.) 
 \section{Solver in the Loop}
 After we have generated the training set and its downsampled version, we can start the training. We will first cover the basics of the network and its training goal, then we will go into details of how to apply the loss function.
 \subsection{Network}
