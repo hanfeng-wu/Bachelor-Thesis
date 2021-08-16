@@ -23,6 +23,8 @@
 \usepackage{wasysym}
 \usepackage[capitalize, noabbrev]{cleveref}
 
+\usepackage{svg}
+\usepackage{amsmath}
 
 \usepackage{subcaption}
 
@@ -392,6 +394,11 @@ For both tasks, we have a total of 8 simulations with their renolds numbers rang
 \subsection{Network}
 We used a very simple bottle-neck like and fully convolutional neural network for the Autoencoder.
 
+\begin{figure}
+  \centering
+  \includegraphics[width=\textwidth]{autoencoder.png}
+  \caption{The structure of Autoencoder}
+\end{figure}
 
 \section{Superresolution}
 
@@ -500,27 +507,27 @@ We first pick a dataset from our training set as the testset with renolds number
 \begin{subfigure}{0.18\textwidth}
   \centering
   \includegraphics[scale=0.28]{buoyancy/dens_000050_ref.png}
-  \caption{$\Delta t=50$}
+  \caption{$t=50$}
 \end{subfigure}
 \begin{subfigure}{0.18\textwidth}
   \centering
   \includegraphics[scale=0.28]{buoyancy/dens_000100_ref.png}
-  \caption{$\Delta t=100$}
+  \caption{$t=100$}
 \end{subfigure}
 \begin{subfigure}{0.18\textwidth}
   \centering
   \includegraphics[scale=0.28]{buoyancy/dens_000150_ref.png}
-  \caption{$\Delta t=150$}
+  \caption{$t=150$}
 \end{subfigure}
 \begin{subfigure}{0.18\textwidth}
   \centering
   \includegraphics[scale=0.28]{buoyancy/dens_000200_ref.png}
-  \caption{$\Delta t=200$}
+  \caption{$t=200$}
 \end{subfigure}
 \begin{subfigure}{0.18\textwidth}
   \centering
   \includegraphics[scale=0.28]{buoyancy/dens_000249_ref.png}
-  \caption{$\Delta t=250$}
+  \caption{$t=250$}
 \end{subfigure}
 \caption{Reference simulation}
 \end{figure}
@@ -531,27 +538,27 @@ We first pick a dataset from our training set as the testset with renolds number
 \begin{subfigure}{0.18\textwidth}
   \centering
   \includegraphics[scale=0.56]{buoyancy/dens_000050_src.png}
-  \caption{$\Delta t=50$}
+  \caption{$t=50$}
 \end{subfigure}
 \begin{subfigure}{0.18\textwidth}
   \centering
   \includegraphics[scale=0.56]{buoyancy/dens_000100_src.png}
-  \caption{$\Delta t=100$}
+  \caption{$t=100$}
 \end{subfigure}
 \begin{subfigure}{0.18\textwidth}
   \centering
   \includegraphics[scale=0.56]{buoyancy/dens_000150_src.png}
-  \caption{$\Delta t=150$}
+  \caption{$t=150$}
 \end{subfigure}
 \begin{subfigure}{0.18\textwidth}
   \centering
   \includegraphics[scale=0.56]{buoyancy/dens_000200_src.png}
-  \caption{$\Delta t=200$}
+  \caption{$t=200$}
 \end{subfigure}
 \begin{subfigure}{0.18\textwidth}
   \centering
   \includegraphics[scale=0.56]{buoyancy/dens_000249_src.png}
-  \caption{$\Delta t=250$}
+  \caption{$t=250$}
 \end{subfigure}
 \caption{Source simulation}
 \end{figure}
@@ -561,27 +568,27 @@ We first pick a dataset from our training set as the testset with renolds number
 \begin{subfigure}{0.18\textwidth}
   \centering
   \includegraphics[scale=0.56]{buoyancy/dens_000050_lsim.png}
-  \caption{$\Delta t=50$}
+  \caption{$t=50$}
 \end{subfigure}
 \begin{subfigure}{0.18\textwidth}
   \centering
   \includegraphics[scale=0.56]{buoyancy/dens_000100_lsim.png}
-  \caption{$\Delta t=100$}
+  \caption{$t=100$}
 \end{subfigure}
 \begin{subfigure}{0.18\textwidth}
   \centering
   \includegraphics[scale=0.56]{buoyancy/dens_000150_lsim.png}
-  \caption{$\Delta t=150$}
+  \caption{$t=150$}
 \end{subfigure}
 \begin{subfigure}{0.18\textwidth}
   \centering
   \includegraphics[scale=0.56]{buoyancy/dens_000200_lsim.png}
-  \caption{$\Delta t=200$}
+  \caption{$t=200$}
 \end{subfigure}
 \begin{subfigure}{0.18\textwidth}
   \centering
   \includegraphics[scale=0.56]{buoyancy/dens_000249_lsim.png}
-  \caption{$\Delta t=250$}
+  \caption{$t=250$}
 \end{subfigure}
 \caption{simulation with lsim}
 \end{figure}
@@ -591,27 +598,27 @@ We first pick a dataset from our training set as the testset with renolds number
 \begin{subfigure}{0.18\textwidth}
   \centering
   \includegraphics[scale=0.56]{buoyancy/dens_000050_mse.png}
-  \caption{$\Delta t=50$}
+  \caption{$t=50$}
 \end{subfigure}
 \begin{subfigure}{0.18\textwidth}
   \centering
   \includegraphics[scale=0.56]{buoyancy/dens_000100_mse.png}
-  \caption{$\Delta t=100$}
+  \caption{$t=100$}
 \end{subfigure}
 \begin{subfigure}{0.18\textwidth}
   \centering
   \includegraphics[scale=0.56]{buoyancy/dens_000150_mse.png}
-  \caption{$\Delta t=150$}
+  \caption{$t=150$}
 \end{subfigure}
 \begin{subfigure}{0.18\textwidth}
   \centering
   \includegraphics[scale=0.56]{buoyancy/dens_000200_mse.png}
-  \caption{$\Delta t=200$}
+  \caption{$t=200$}
 \end{subfigure}
 \begin{subfigure}{0.18\textwidth}
   \centering
   \includegraphics[scale=0.56]{buoyancy/dens_000249_mse.png}
-  \caption{$\Delta t=250$}
+  \caption{$t=250$}
 \end{subfigure}
 \caption{simulation with mse}
 \end{figure}
@@ -621,27 +628,27 @@ We first pick a dataset from our training set as the testset with renolds number
 \begin{subfigure}{0.18\textwidth}
   \centering
   \includegraphics[scale=0.56]{buoyancy/dens_000050_vgg.png}
-  \caption{$\Delta t=50$}
+  \caption{$t=50$}
 \end{subfigure}
 \begin{subfigure}{0.18\textwidth}
   \centering
   \includegraphics[scale=0.56]{buoyancy/dens_000100_vgg.png}
-  \caption{$\Delta t=100$}
+  \caption{$t=100$}
 \end{subfigure}
 \begin{subfigure}{0.18\textwidth}
   \centering
   \includegraphics[scale=0.56]{buoyancy/dens_000150_vgg.png}
-  \caption{$\Delta t=150$}
+  \caption{$t=150$}
 \end{subfigure}
 \begin{subfigure}{0.18\textwidth}
   \centering
   \includegraphics[scale=0.56]{buoyancy/dens_000200_vgg.png}
-  \caption{$\Delta t=200$}
+  \caption{$t=200$}
 \end{subfigure}
 \begin{subfigure}{0.18\textwidth}
   \centering
   \includegraphics[scale=0.56]{buoyancy/dens_000249_vgg.png}
-  \caption{$\Delta t=250$}
+  \caption{$t=250$}
 \end{subfigure}
 \caption{simulation with vgg}
 \end{figure}
@@ -651,27 +658,27 @@ We first pick a dataset from our training set as the testset with renolds number
 \begin{subfigure}{0.18\textwidth}
   \centering
   \includegraphics[scale=0.56]{buoyancy/dens_000050_lpips.png}
-  \caption{$\Delta t=50$}
+  \caption{$t=50$}
 \end{subfigure}
 \begin{subfigure}{0.18\textwidth}
   \centering
   \includegraphics[scale=0.56]{buoyancy/dens_000100_lpips.png}
-  \caption{$\Delta t=100$}
+  \caption{$t=100$}
 \end{subfigure}
 \begin{subfigure}{0.18\textwidth}
   \centering
   \includegraphics[scale=0.56]{buoyancy/dens_000150_lpips.png}
-  \caption{$\Delta t=150$}
+  \caption{$t=150$}
 \end{subfigure}
 \begin{subfigure}{0.18\textwidth}
   \centering
   \includegraphics[scale=0.56]{buoyancy/dens_000200_lpips.png}
-  \caption{$\Delta t=200$}
+  \caption{$t=200$}
 \end{subfigure}
 \begin{subfigure}{0.18\textwidth}
   \centering
   \includegraphics[scale=0.56]{buoyancy/dens_000249_lpips.png}
-  \caption{$\Delta t=250$}
+  \caption{$t=250$}
 \end{subfigure}
 \caption{simulation with lpips}
 \end{figure}
@@ -710,33 +717,35 @@ We first pick a dataset from our training set as the testset with renolds number
 \end{subfigure}
 \caption{Numerical evaluation of each metrics on training set}
 \end{figure}
+
+
 However when we generate a test set with the renolds number of 2.5e5 which was not included in the training set, the results are then different.
 \begin{figure}
 \centering
 \begin{subfigure}{0.18\textwidth}
   \centering
   \includegraphics[scale=0.28]{buoyancy_test/dens_000050_ref.png}
-  \caption{$\Delta t=50$}
+  \caption{$t=50$}
 \end{subfigure}
 \begin{subfigure}{0.18\textwidth}
   \centering
   \includegraphics[scale=0.28]{buoyancy_test/dens_000100_ref.png}
-  \caption{$\Delta t=100$}
+  \caption{$t=100$}
 \end{subfigure}
 \begin{subfigure}{0.18\textwidth}
   \centering
   \includegraphics[scale=0.28]{buoyancy_test/dens_000150_ref.png}
-  \caption{$\Delta t=150$}
+  \caption{$t=150$}
 \end{subfigure}
 \begin{subfigure}{0.18\textwidth}
   \centering
   \includegraphics[scale=0.28]{buoyancy_test/dens_000200_ref.png}
-  \caption{$\Delta t=200$}
+  \caption{$t=200$}
 \end{subfigure}
 \begin{subfigure}{0.18\textwidth}
   \centering
   \includegraphics[scale=0.28]{buoyancy_test/dens_000249_ref.png}
-  \caption{$\Delta t=250$}
+  \caption{$t=250$}
 \end{subfigure}
 \caption{Reference simulation}
 \end{figure}
@@ -746,27 +755,27 @@ However when we generate a test set with the renolds number of 2.5e5 which was n
 \begin{subfigure}{0.18\textwidth}
   \centering
   \includegraphics[scale=0.56]{buoyancy_test/dens_000050_src.png}
-  \caption{$\Delta t=50$}
+  \caption{$t=50$}
 \end{subfigure}
 \begin{subfigure}{0.18\textwidth}
   \centering
   \includegraphics[scale=0.56]{buoyancy_test/dens_000100_src.png}
-  \caption{$\Delta t=100$}
+  \caption{$t=100$}
 \end{subfigure}
 \begin{subfigure}{0.18\textwidth}
   \centering
   \includegraphics[scale=0.56]{buoyancy_test/dens_000150_src.png}
-  \caption{$\Delta t=150$}
+  \caption{$t=150$}
 \end{subfigure}
 \begin{subfigure}{0.18\textwidth}
   \centering
   \includegraphics[scale=0.56]{buoyancy_test/dens_000200_src.png}
-  \caption{$\Delta t=200$}
+  \caption{$t=200$}
 \end{subfigure}
 \begin{subfigure}{0.18\textwidth}
   \centering
   \includegraphics[scale=0.56]{buoyancy_test/dens_000249_src.png}
-  \caption{$\Delta t=250$}
+  \caption{$t=250$}
 \end{subfigure}
 \caption{Source simulation}
 \end{figure}
@@ -776,27 +785,27 @@ However when we generate a test set with the renolds number of 2.5e5 which was n
 \begin{subfigure}{0.18\textwidth}
   \centering
   \includegraphics[scale=0.56]{buoyancy_test/dens_000050_lsim.png}
-  \caption{$\Delta t=50$}
+  \caption{$t=50$}
 \end{subfigure}
 \begin{subfigure}{0.18\textwidth}
   \centering
   \includegraphics[scale=0.56]{buoyancy_test/dens_000100_lsim.png}
-  \caption{$\Delta t=100$}
+  \caption{$t=100$}
 \end{subfigure}
 \begin{subfigure}{0.18\textwidth}
   \centering
   \includegraphics[scale=0.56]{buoyancy_test/dens_000150_lsim.png}
-  \caption{$\Delta t=150$}
+  \caption{$t=150$}
 \end{subfigure}
 \begin{subfigure}{0.18\textwidth}
   \centering
   \includegraphics[scale=0.56]{buoyancy_test/dens_000200_lsim.png}
-  \caption{$\Delta t=200$}
+  \caption{$t=200$}
 \end{subfigure}
 \begin{subfigure}{0.18\textwidth}
   \centering
   \includegraphics[scale=0.56]{buoyancy_test/dens_000249_lsim.png}
-  \caption{$\Delta t=250$}
+  \caption{$t=250$}
 \end{subfigure}
 \caption{simulation with lsim}
 \end{figure}
@@ -806,27 +815,27 @@ However when we generate a test set with the renolds number of 2.5e5 which was n
 \begin{subfigure}{0.18\textwidth}
   \centering
   \includegraphics[scale=0.56]{buoyancy_test/dens_000050_mse.png}
-  \caption{$\Delta t=50$}
+  \caption{$t=50$}
 \end{subfigure}
 \begin{subfigure}{0.18\textwidth}
   \centering
   \includegraphics[scale=0.56]{buoyancy_test/dens_000100_mse.png}
-  \caption{$\Delta t=100$}
+  \caption{$t=100$}
 \end{subfigure}
 \begin{subfigure}{0.18\textwidth}
   \centering
   \includegraphics[scale=0.56]{buoyancy_test/dens_000150_mse.png}
-  \caption{$\Delta t=150$}
+  \caption{$t=150$}
 \end{subfigure}
 \begin{subfigure}{0.18\textwidth}
   \centering
   \includegraphics[scale=0.56]{buoyancy_test/dens_000200_mse.png}
-  \caption{$\Delta t=200$}
+  \caption{$t=200$}
 \end{subfigure}
 \begin{subfigure}{0.18\textwidth}
   \centering
   \includegraphics[scale=0.56]{buoyancy_test/dens_000249_mse.png}
-  \caption{$\Delta t=250$}
+  \caption{$t=250$}
 \end{subfigure}
 \caption{simulation with mse}
 \end{figure}
@@ -836,27 +845,27 @@ However when we generate a test set with the renolds number of 2.5e5 which was n
 \begin{subfigure}{0.18\textwidth}
   \centering
   \includegraphics[scale=0.56]{buoyancy_test/dens_000050_vgg.png}
-  \caption{$\Delta t=50$}
+  \caption{$t=50$}
 \end{subfigure}
 \begin{subfigure}{0.18\textwidth}
   \centering
   \includegraphics[scale=0.56]{buoyancy_test/dens_000100_vgg.png}
-  \caption{$\Delta t=100$}
+  \caption{$t=100$}
 \end{subfigure}
 \begin{subfigure}{0.18\textwidth}
   \centering
   \includegraphics[scale=0.56]{buoyancy_test/dens_000150_vgg.png}
-  \caption{$\Delta t=150$}
+  \caption{$t=150$}
 \end{subfigure}
 \begin{subfigure}{0.18\textwidth}
   \centering
   \includegraphics[scale=0.56]{buoyancy_test/dens_000200_vgg.png}
-  \caption{$\Delta t=200$}
+  \caption{$t=200$}
 \end{subfigure}
 \begin{subfigure}{0.18\textwidth}
   \centering
   \includegraphics[scale=0.56]{buoyancy_test/dens_000249_vgg.png}
-  \caption{$\Delta t=250$}
+  \caption{$t=250$}
 \end{subfigure}
 \caption{simulation with vgg}
 \end{figure}
@@ -866,27 +875,27 @@ However when we generate a test set with the renolds number of 2.5e5 which was n
 \begin{subfigure}{0.18\textwidth}
   \centering
   \includegraphics[scale=0.56]{buoyancy_test/dens_000050_lpips.png}
-  \caption{$\Delta t=50$}
+  \caption{$t=50$}
 \end{subfigure}
 \begin{subfigure}{0.18\textwidth}
   \centering
   \includegraphics[scale=0.56]{buoyancy_test/dens_000100_lpips.png}
-  \caption{$\Delta t=100$}
+  \caption{$t=100$}
 \end{subfigure}
 \begin{subfigure}{0.18\textwidth}
   \centering
   \includegraphics[scale=0.56]{buoyancy_test/dens_000150_lpips.png}
-  \caption{$\Delta t=150$}
+  \caption{$t=150$}
 \end{subfigure}
 \begin{subfigure}{0.18\textwidth}
   \centering
   \includegraphics[scale=0.56]{buoyancy_test/dens_000200_lpips.png}
-  \caption{$\Delta t=200$}
+  \caption{$t=200$}
 \end{subfigure}
 \begin{subfigure}{0.18\textwidth}
   \centering
   \includegraphics[scale=0.56]{buoyancy_test/dens_000249_lpips.png}
-  \caption{$\Delta t=250$}
+  \caption{$t=250$}
 \end{subfigure}
 \caption{simulation with lpips}
 \end{figure}
