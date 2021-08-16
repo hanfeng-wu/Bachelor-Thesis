@@ -390,7 +390,7 @@ For both tasks, we have a total of 8 simulations with their renolds numbers rang
 
 \section{Autoencoder}
 \subsection{Network}
-We use a very simple bottle-neck like and fully convolutional neural network for the Autoencoder.
+We used a very simple bottle-neck like and fully convolutional neural network for the Autoencoder.
 
 
 \section{Superresolution}
@@ -485,8 +485,411 @@ where F is the respective perceptual loss function. In this way, we are able to 
 
 \section{Comparison}
 
-\subsection{Numerical evaluation}
+\subsection{Solver in the loop}
+After training lots of models on both buoyancy driven flow and the karmanflow of different resolutions, we have following results. In terms of numerical evaluation, we compute the distance of various metrics(l1, l2, mse, lsim, ssim, lpips) between the simulation corrected by the models trained by different loss functions, and the downsampled reference simulation. We compute the distance between each corresponding frames pair and compute their average as the result.
+\begin{itemize}
+  \item Karmanflow
+\end{itemize}
 
+\begin{itemize}
+  \item Buoyancy driven flow
+\end{itemize}
+We first pick a dataset from our training set as the testset with renolds number of 2e5(note the renolds numbers of out trainingset range from 1e5 to 8e5)
+\begin{figure}
+\centering
+\begin{subfigure}{0.18\textwidth}
+  \centering
+  \includegraphics[scale=0.28]{buoyancy/dens_000050_ref.png}
+  \caption{$\Delta t=50$}
+\end{subfigure}
+\begin{subfigure}{0.18\textwidth}
+  \centering
+  \includegraphics[scale=0.28]{buoyancy/dens_000100_ref.png}
+  \caption{$\Delta t=100$}
+\end{subfigure}
+\begin{subfigure}{0.18\textwidth}
+  \centering
+  \includegraphics[scale=0.28]{buoyancy/dens_000150_ref.png}
+  \caption{$\Delta t=150$}
+\end{subfigure}
+\begin{subfigure}{0.18\textwidth}
+  \centering
+  \includegraphics[scale=0.28]{buoyancy/dens_000200_ref.png}
+  \caption{$\Delta t=200$}
+\end{subfigure}
+\begin{subfigure}{0.18\textwidth}
+  \centering
+  \includegraphics[scale=0.28]{buoyancy/dens_000249_ref.png}
+  \caption{$\Delta t=250$}
+\end{subfigure}
+\caption{Reference simulation}
+\end{figure}
+
+
+\begin{figure}
+\centering
+\begin{subfigure}{0.18\textwidth}
+  \centering
+  \includegraphics[scale=0.56]{buoyancy/dens_000050_src.png}
+  \caption{$\Delta t=50$}
+\end{subfigure}
+\begin{subfigure}{0.18\textwidth}
+  \centering
+  \includegraphics[scale=0.56]{buoyancy/dens_000100_src.png}
+  \caption{$\Delta t=100$}
+\end{subfigure}
+\begin{subfigure}{0.18\textwidth}
+  \centering
+  \includegraphics[scale=0.56]{buoyancy/dens_000150_src.png}
+  \caption{$\Delta t=150$}
+\end{subfigure}
+\begin{subfigure}{0.18\textwidth}
+  \centering
+  \includegraphics[scale=0.56]{buoyancy/dens_000200_src.png}
+  \caption{$\Delta t=200$}
+\end{subfigure}
+\begin{subfigure}{0.18\textwidth}
+  \centering
+  \includegraphics[scale=0.56]{buoyancy/dens_000249_src.png}
+  \caption{$\Delta t=250$}
+\end{subfigure}
+\caption{Source simulation}
+\end{figure}
+
+\begin{figure}
+\centering
+\begin{subfigure}{0.18\textwidth}
+  \centering
+  \includegraphics[scale=0.56]{buoyancy/dens_000050_lsim.png}
+  \caption{$\Delta t=50$}
+\end{subfigure}
+\begin{subfigure}{0.18\textwidth}
+  \centering
+  \includegraphics[scale=0.56]{buoyancy/dens_000100_lsim.png}
+  \caption{$\Delta t=100$}
+\end{subfigure}
+\begin{subfigure}{0.18\textwidth}
+  \centering
+  \includegraphics[scale=0.56]{buoyancy/dens_000150_lsim.png}
+  \caption{$\Delta t=150$}
+\end{subfigure}
+\begin{subfigure}{0.18\textwidth}
+  \centering
+  \includegraphics[scale=0.56]{buoyancy/dens_000200_lsim.png}
+  \caption{$\Delta t=200$}
+\end{subfigure}
+\begin{subfigure}{0.18\textwidth}
+  \centering
+  \includegraphics[scale=0.56]{buoyancy/dens_000249_lsim.png}
+  \caption{$\Delta t=250$}
+\end{subfigure}
+\caption{simulation with lsim}
+\end{figure}
+
+\begin{figure}
+\centering
+\begin{subfigure}{0.18\textwidth}
+  \centering
+  \includegraphics[scale=0.56]{buoyancy/dens_000050_mse.png}
+  \caption{$\Delta t=50$}
+\end{subfigure}
+\begin{subfigure}{0.18\textwidth}
+  \centering
+  \includegraphics[scale=0.56]{buoyancy/dens_000100_mse.png}
+  \caption{$\Delta t=100$}
+\end{subfigure}
+\begin{subfigure}{0.18\textwidth}
+  \centering
+  \includegraphics[scale=0.56]{buoyancy/dens_000150_mse.png}
+  \caption{$\Delta t=150$}
+\end{subfigure}
+\begin{subfigure}{0.18\textwidth}
+  \centering
+  \includegraphics[scale=0.56]{buoyancy/dens_000200_mse.png}
+  \caption{$\Delta t=200$}
+\end{subfigure}
+\begin{subfigure}{0.18\textwidth}
+  \centering
+  \includegraphics[scale=0.56]{buoyancy/dens_000249_mse.png}
+  \caption{$\Delta t=250$}
+\end{subfigure}
+\caption{simulation with mse}
+\end{figure}
+
+\begin{figure}
+\centering
+\begin{subfigure}{0.18\textwidth}
+  \centering
+  \includegraphics[scale=0.56]{buoyancy/dens_000050_vgg.png}
+  \caption{$\Delta t=50$}
+\end{subfigure}
+\begin{subfigure}{0.18\textwidth}
+  \centering
+  \includegraphics[scale=0.56]{buoyancy/dens_000100_vgg.png}
+  \caption{$\Delta t=100$}
+\end{subfigure}
+\begin{subfigure}{0.18\textwidth}
+  \centering
+  \includegraphics[scale=0.56]{buoyancy/dens_000150_vgg.png}
+  \caption{$\Delta t=150$}
+\end{subfigure}
+\begin{subfigure}{0.18\textwidth}
+  \centering
+  \includegraphics[scale=0.56]{buoyancy/dens_000200_vgg.png}
+  \caption{$\Delta t=200$}
+\end{subfigure}
+\begin{subfigure}{0.18\textwidth}
+  \centering
+  \includegraphics[scale=0.56]{buoyancy/dens_000249_vgg.png}
+  \caption{$\Delta t=250$}
+\end{subfigure}
+\caption{simulation with vgg}
+\end{figure}
+
+\begin{figure}
+\centering
+\begin{subfigure}{0.18\textwidth}
+  \centering
+  \includegraphics[scale=0.56]{buoyancy/dens_000050_lpips.png}
+  \caption{$\Delta t=50$}
+\end{subfigure}
+\begin{subfigure}{0.18\textwidth}
+  \centering
+  \includegraphics[scale=0.56]{buoyancy/dens_000100_lpips.png}
+  \caption{$\Delta t=100$}
+\end{subfigure}
+\begin{subfigure}{0.18\textwidth}
+  \centering
+  \includegraphics[scale=0.56]{buoyancy/dens_000150_lpips.png}
+  \caption{$\Delta t=150$}
+\end{subfigure}
+\begin{subfigure}{0.18\textwidth}
+  \centering
+  \includegraphics[scale=0.56]{buoyancy/dens_000200_lpips.png}
+  \caption{$\Delta t=200$}
+\end{subfigure}
+\begin{subfigure}{0.18\textwidth}
+  \centering
+  \includegraphics[scale=0.56]{buoyancy/dens_000249_lpips.png}
+  \caption{$\Delta t=250$}
+\end{subfigure}
+\caption{simulation with lpips}
+\end{figure}
+
+\begin{figure}
+\centering
+\begin{subfigure}{0.49\textwidth}
+  \centering
+  \includegraphics[scale=0.4]{buoyancy/l2.png}
+  \caption{l2 evaluation}
+\end{subfigure}
+\begin{subfigure}{0.49\textwidth}
+  \centering
+  \includegraphics[scale=0.4]{buoyancy/l1.png}
+  \caption{l1 evaluation}
+\end{subfigure}
+\begin{subfigure}{0.49\textwidth}
+  \centering
+  \includegraphics[scale=0.4]{buoyancy/mse.png}
+  \caption{mse evaluation}
+\end{subfigure}
+\begin{subfigure}{0.49\textwidth}
+  \centering
+  \includegraphics[scale=0.4]{buoyancy/lsim.png}
+  \caption{lsim evaluation}
+\end{subfigure}
+\begin{subfigure}{0.49\textwidth}
+  \centering
+  \includegraphics[scale=0.4]{buoyancy/ssim.png}
+  \caption{ssim evaluation}
+\end{subfigure}
+\begin{subfigure}{0.49\textwidth}
+  \centering
+  \includegraphics[scale=0.4]{buoyancy/lpips.png}
+  \caption{lpips evaluation}
+\end{subfigure}
+\caption{Numerical evaluation of each metrics on training set}
+\end{figure}
+However when we generate a test set with the renolds number of 2.5e5 which was not included in the training set, the results are then different.
+\begin{figure}
+\centering
+\begin{subfigure}{0.18\textwidth}
+  \centering
+  \includegraphics[scale=0.28]{buoyancy_test/dens_000050_ref.png}
+  \caption{$\Delta t=50$}
+\end{subfigure}
+\begin{subfigure}{0.18\textwidth}
+  \centering
+  \includegraphics[scale=0.28]{buoyancy_test/dens_000100_ref.png}
+  \caption{$\Delta t=100$}
+\end{subfigure}
+\begin{subfigure}{0.18\textwidth}
+  \centering
+  \includegraphics[scale=0.28]{buoyancy_test/dens_000150_ref.png}
+  \caption{$\Delta t=150$}
+\end{subfigure}
+\begin{subfigure}{0.18\textwidth}
+  \centering
+  \includegraphics[scale=0.28]{buoyancy_test/dens_000200_ref.png}
+  \caption{$\Delta t=200$}
+\end{subfigure}
+\begin{subfigure}{0.18\textwidth}
+  \centering
+  \includegraphics[scale=0.28]{buoyancy_test/dens_000249_ref.png}
+  \caption{$\Delta t=250$}
+\end{subfigure}
+\caption{Reference simulation}
+\end{figure}
+
+\begin{figure}
+\centering
+\begin{subfigure}{0.18\textwidth}
+  \centering
+  \includegraphics[scale=0.56]{buoyancy_test/dens_000050_src.png}
+  \caption{$\Delta t=50$}
+\end{subfigure}
+\begin{subfigure}{0.18\textwidth}
+  \centering
+  \includegraphics[scale=0.56]{buoyancy_test/dens_000100_src.png}
+  \caption{$\Delta t=100$}
+\end{subfigure}
+\begin{subfigure}{0.18\textwidth}
+  \centering
+  \includegraphics[scale=0.56]{buoyancy_test/dens_000150_src.png}
+  \caption{$\Delta t=150$}
+\end{subfigure}
+\begin{subfigure}{0.18\textwidth}
+  \centering
+  \includegraphics[scale=0.56]{buoyancy_test/dens_000200_src.png}
+  \caption{$\Delta t=200$}
+\end{subfigure}
+\begin{subfigure}{0.18\textwidth}
+  \centering
+  \includegraphics[scale=0.56]{buoyancy_test/dens_000249_src.png}
+  \caption{$\Delta t=250$}
+\end{subfigure}
+\caption{Source simulation}
+\end{figure}
+
+\begin{figure}
+\centering
+\begin{subfigure}{0.18\textwidth}
+  \centering
+  \includegraphics[scale=0.56]{buoyancy_test/dens_000050_lsim.png}
+  \caption{$\Delta t=50$}
+\end{subfigure}
+\begin{subfigure}{0.18\textwidth}
+  \centering
+  \includegraphics[scale=0.56]{buoyancy_test/dens_000100_lsim.png}
+  \caption{$\Delta t=100$}
+\end{subfigure}
+\begin{subfigure}{0.18\textwidth}
+  \centering
+  \includegraphics[scale=0.56]{buoyancy_test/dens_000150_lsim.png}
+  \caption{$\Delta t=150$}
+\end{subfigure}
+\begin{subfigure}{0.18\textwidth}
+  \centering
+  \includegraphics[scale=0.56]{buoyancy_test/dens_000200_lsim.png}
+  \caption{$\Delta t=200$}
+\end{subfigure}
+\begin{subfigure}{0.18\textwidth}
+  \centering
+  \includegraphics[scale=0.56]{buoyancy_test/dens_000249_lsim.png}
+  \caption{$\Delta t=250$}
+\end{subfigure}
+\caption{simulation with lsim}
+\end{figure}
+
+\begin{figure}
+\centering
+\begin{subfigure}{0.18\textwidth}
+  \centering
+  \includegraphics[scale=0.56]{buoyancy_test/dens_000050_mse.png}
+  \caption{$\Delta t=50$}
+\end{subfigure}
+\begin{subfigure}{0.18\textwidth}
+  \centering
+  \includegraphics[scale=0.56]{buoyancy_test/dens_000100_mse.png}
+  \caption{$\Delta t=100$}
+\end{subfigure}
+\begin{subfigure}{0.18\textwidth}
+  \centering
+  \includegraphics[scale=0.56]{buoyancy_test/dens_000150_mse.png}
+  \caption{$\Delta t=150$}
+\end{subfigure}
+\begin{subfigure}{0.18\textwidth}
+  \centering
+  \includegraphics[scale=0.56]{buoyancy_test/dens_000200_mse.png}
+  \caption{$\Delta t=200$}
+\end{subfigure}
+\begin{subfigure}{0.18\textwidth}
+  \centering
+  \includegraphics[scale=0.56]{buoyancy_test/dens_000249_mse.png}
+  \caption{$\Delta t=250$}
+\end{subfigure}
+\caption{simulation with mse}
+\end{figure}
+
+\begin{figure}
+\centering
+\begin{subfigure}{0.18\textwidth}
+  \centering
+  \includegraphics[scale=0.56]{buoyancy_test/dens_000050_vgg.png}
+  \caption{$\Delta t=50$}
+\end{subfigure}
+\begin{subfigure}{0.18\textwidth}
+  \centering
+  \includegraphics[scale=0.56]{buoyancy_test/dens_000100_vgg.png}
+  \caption{$\Delta t=100$}
+\end{subfigure}
+\begin{subfigure}{0.18\textwidth}
+  \centering
+  \includegraphics[scale=0.56]{buoyancy_test/dens_000150_vgg.png}
+  \caption{$\Delta t=150$}
+\end{subfigure}
+\begin{subfigure}{0.18\textwidth}
+  \centering
+  \includegraphics[scale=0.56]{buoyancy_test/dens_000200_vgg.png}
+  \caption{$\Delta t=200$}
+\end{subfigure}
+\begin{subfigure}{0.18\textwidth}
+  \centering
+  \includegraphics[scale=0.56]{buoyancy_test/dens_000249_vgg.png}
+  \caption{$\Delta t=250$}
+\end{subfigure}
+\caption{simulation with vgg}
+\end{figure}
+
+\begin{figure}
+\centering
+\begin{subfigure}{0.18\textwidth}
+  \centering
+  \includegraphics[scale=0.56]{buoyancy_test/dens_000050_lpips.png}
+  \caption{$\Delta t=50$}
+\end{subfigure}
+\begin{subfigure}{0.18\textwidth}
+  \centering
+  \includegraphics[scale=0.56]{buoyancy_test/dens_000100_lpips.png}
+  \caption{$\Delta t=100$}
+\end{subfigure}
+\begin{subfigure}{0.18\textwidth}
+  \centering
+  \includegraphics[scale=0.56]{buoyancy_test/dens_000150_lpips.png}
+  \caption{$\Delta t=150$}
+\end{subfigure}
+\begin{subfigure}{0.18\textwidth}
+  \centering
+  \includegraphics[scale=0.56]{buoyancy_test/dens_000200_lpips.png}
+  \caption{$\Delta t=200$}
+\end{subfigure}
+\begin{subfigure}{0.18\textwidth}
+  \centering
+  \includegraphics[scale=0.56]{buoyancy_test/dens_000249_lpips.png}
+  \caption{$\Delta t=250$}
+\end{subfigure}
+\caption{simulation with lpips}
+\end{figure}
 \subsection{Time cost evaluation}
 
 \section{Limitaions}
