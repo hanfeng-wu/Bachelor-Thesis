@@ -206,14 +206,17 @@ In this paper we mainly focus on comparing the performance between traditional l
 
 
 \chapter{Related Work}
-similar goal area methods
+\section{Perceptual loss related}
+The idea of using perceptual loss or jumping out of the traditional loss function has firstly begun by \cite{wang2004}, the author adopted in his work $L^p$ norms for images, yet it was still not extracting any deep features of the images. This situation has changed  until the discovery of CNN. Because CNNs are able to extract a lot of deep features structures and patterns from the image datasets (for example in 2014 \cite{simonyan2014very} has proposed the VGG structure which achieve a very good score on the ImageNet challenge), therefore more and more  works tend to use perceptual loss to evaluate their models\cite{amirshahi2016, berardino2017, bosse2016, kang2014, kim2017}. In 2016 \cite{johnson2016perceptual} used intermediate layer comparison from the trained VGG-16 network to evaluate their model for both super-resolution task and style-transfer task.  in 2018 \cite{zhang2018perceptual} developed a new approach to compute the perceptual loss function based on the trained deep CNNs, which, shown in his title, achieved unreasonable effectiveness. In 2020 \cite{kohl2020learning} proposed a new perceptual metric which focused on the numerical evaluation data.
+\section{Fluid simulation related}
+The method of adopting NS-equation in fluid simulation has firstly been brought up by \cite{doi:10.1063/1.1761178} in 1965.
 
 
 %------- chapter 2 -------
 
 \chapter{Metrics and Perceptual Losses}
 
-In this chapter we will cover several loss functions that we adopted in this paper and briefly explain their characteristics and their drawbacks. More percise integrations and results will be convered in the chapter 5.
+In this chapter we will cover several loss functions that we adopted in this paper and briefly explain their characteristics and their drawbacks. More precise integration and results will be covered in the chapter 5.
 
 \section{Mean Squre Error}
 
