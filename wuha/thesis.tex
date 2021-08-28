@@ -211,15 +211,10 @@ When we want to perform our fluid simulation on a lower-resolution domain to dec
 
 
 \chapter{Related Work}
-\section{Perceptual loss related}
-The idea of using perceptual loss or jumping out of the traditional loss function has firstly begun by \cite{wang2004}, the author adopted in his work $L^p$ norms for images, yet it was still not extracting any deep features of the images. This situation has changed  until the discovery of CNN. Because CNNs are able to extract a lot of deep features structures and patterns from the image datasets (for example in 2014 \cite{simonyan2014very} has proposed the VGG structure which achieve a very good score on the ImageNet challenge), therefore more and more  works tend to use perceptual loss to evaluate their models\cite{amirshahi2016, berardino2017, bosse2016, kang2014, kim2017}. In 2016 \cite{johnson2016perceptual} used intermediate layer comparison from the trained VGG-16 network to evaluate their model for both super-resolution task and style-transfer task.  in 2018 \cite{zhang2018perceptual} developed a new approach to compute the perceptual loss function based on the trained deep CNNs, which, shown in his title, achieved unreasonable effectiveness. In 2020 \cite{kohl2020learning} proposed a new perceptual metric which focused on the numerical evaluation data.
-\section{Fluid simulation related}
-The method of adopting NS-equation in fluid simulation has firstly been brought up by \cite{doi:10.1063/1.1761178} in 1965. 
+The idea of jumping out of the traditional metrics based on $L^p$ norm has firstly begun by \cite{wang2004}, who developed the structure similarity index. Yet it was still not a perceptual loss and can not extract any deep features of the images. This situation has changed  until the discovery of CNN. Because CNNs are able to extract a lot of deep features structures and patterns from the image datasets (for example in 2014 \cite{simonyan2014very} has proposed the VGG structure which achieve a very good score on the ImageNet challenge), therefore more and more  works tend to use perceptual loss to evaluate their models\cite{amirshahi2016, berardino2017, bosse2016, kang2014, kim2017}. In 2016 \cite{johnson2016perceptual} used intermediate layer comparison from the trained VGG-16 network to evaluate their model for both super-resolution task and style-transfer task.  in 2018 \cite{zhang2018perceptual} developed a new approach to compute the perceptual loss function based on the trained deep CNNs, which, shown in his title, achieved unreasonable effectiveness. In 2020 \cite{kohl2020learning} proposed a new perceptual metric which focused on the numerical evaluation data.
 
-Then PDE models with machine learning started to be popular \cite{crutchfield1987equations,kevrekidis2003equation,brunton2016discovering}.
-Then a lot of 
+The PDE model of adopting NS-equation in fluid simulation has firstly been brought up by \cite{doi:10.1063/1.1761178} in 1965. Then PDE models with machine learning started to be popular \cite{crutchfield1987equations,kevrekidis2003equation,brunton2016discovering}. More recently deep learning starting to play an important role in fluid dynamics \cite{kutz2017}. In 2019, \citeauthor{barsinai2019data} successfully integrate deep learning method into advection-diffusion problems to infer stencils. With the development of Phiflow \cite{holl2020learning}, Beside performing physical simulations, we are able to integrate different deep learning backends (Tensorflow and Pytorch), so that we can track the gradient of the vectors that are stored in different grid formats. With the help of Phiflow, \cite{um2020sol} used phiflow based deep learning methods to reduce the numerical error when performing fluid simulations. In 2020 \citeauthor{kim2020lagrangian} developed a neural style transfer approach from images to 3D fluids formulated in a Lagrangian viewpoint. Instead of using grid-based structure, \citeauthor{kim2020lagrangian} used particles for style transfer, which significantly reduce the training time.
 
-With the development of Phiflow \cite{holl2020learning}, Beside performing physical simulations, we are able to integrate different deep learning backends (Tensorflow and Pytorch), so that we can track the gradient of the vectors that are stored in different grid formats. With the help of Phiflow, \cite{um2020sol} used phiflow based deep learningl methods to reduce the numerical error when performing fluid simulations.
 
 
 %------- chapter 2 -------
@@ -511,7 +506,106 @@ where F is the respective perceptual loss function. In this way, we are able to 
 \chapter{Results and Analysis}
 
 \section{Comparison}
+\subsection{Autoencoder}
 
+\begin{figure}
+	\centering
+	\begin{subfigure}{0.19\textwidth}
+		\centering
+		\includegraphics[scale=0.29]{autoencoder/ref1.png}
+		\caption{$Reference$}
+	\end{subfigure}
+	\begin{subfigure}{0.19\textwidth}
+		\centering
+		\includegraphics[scale=0.29]{autoencoder/mse1.png}
+		\caption{$MSE$}
+	\end{subfigure}
+	\begin{subfigure}{0.19\textwidth}
+		\centering
+		\includegraphics[scale=0.29]{autoencoder/lsim1.png}
+		\caption{$LSiM$}
+	\end{subfigure}
+	\begin{subfigure}{0.19\textwidth}
+		\centering
+		\includegraphics[scale=0.29]{autoencoder/lpips1.png}
+		\caption{$Lpips$}
+	\end{subfigure}
+	\begin{subfigure}{0.19\textwidth}
+		\centering
+		\includegraphics[scale=0.29]{autoencoder/vgg1.png}
+		\caption{$VGG-16$}
+	\end{subfigure}
+	\caption{Pressure images}
+\end{figure}
+
+
+\begin{figure}
+	\centering
+	\begin{subfigure}{0.19\textwidth}
+		\centering
+		\includegraphics[scale=0.29]{autoencoder/ref2.png}
+		\caption{$Reference$}
+	\end{subfigure}
+	\begin{subfigure}{0.19\textwidth}
+		\centering
+		\includegraphics[scale=0.29]{autoencoder/mse2.png}
+		\caption{$MSE$}
+	\end{subfigure}
+	\begin{subfigure}{0.19\textwidth}
+		\centering
+		\includegraphics[scale=0.29]{autoencoder/lsim2.png}
+		\caption{$LSiM$}
+	\end{subfigure}
+	\begin{subfigure}{0.19\textwidth}
+		\centering
+		\includegraphics[scale=0.29]{autoencoder/lpips2.png}
+		\caption{$Lpips$}
+	\end{subfigure}
+	\begin{subfigure}{0.19\textwidth}
+		\centering
+		\includegraphics[scale=0.29]{autoencoder/vgg2.png}
+		\caption{$VGG-16$}
+	\end{subfigure}
+	\caption{Density images}
+\end{figure}
+ \begin{figure}
+	\centering
+	\begin{subfigure}{0.32\textwidth}
+		\centering
+		\includegraphics[scale=0.5]{autoencoder/l2eval.png}
+		\caption{L2 evaluation}
+	\end{subfigure}
+	\begin{subfigure}{0.32\textwidth}
+		\centering
+		\includegraphics[scale=0.5]{autoencoder/l1eval.png}
+		\caption{L1 evaluation}
+	\end{subfigure}
+	\begin{subfigure}{0.32\textwidth}
+		\centering
+		\includegraphics[scale=0.5]{autoencoder/mseeval.png}
+		\caption{MSE evaluation}
+	\end{subfigure}
+	\begin{subfigure}{0.32\textwidth}
+		\centering
+		\includegraphics[scale=0.5]{autoencoder/lsimeval.png}
+		\caption{LSiM evaluation}
+	\end{subfigure}
+	\begin{subfigure}{0.32\textwidth}
+		\centering
+		\includegraphics[scale=0.5]{autoencoder/ssimeval.png}
+		\caption{SSIM evaluation}
+	\end{subfigure}
+	\begin{subfigure}{0.32\textwidth}
+		\centering
+		\includegraphics[scale=0.5]{autoencoder/lpipseval.png}
+		\caption{Lpips evaluation}
+	\end{subfigure}
+	\caption{Numerical evaluation of each metrics on testset of autoencoder}
+\end{figure}
+We train the autoencoder model on density, pressure and velocity data of smokes, here are some examples of the training outputs. The reference image as well as the training input is on the left side  while the rest are different model outputs trained by their respective losses. We can see that for every output, there are some blur area on the sides. The reason might be that our autoencoder model is too simple so it does not provide enough feature extractors to extract and rebuild the features of the smoke images. MSE and LSiM in this case share similar performance, while Lpips provide a darker reconstruction than the others. The model trained by VGG-16 loss function has the best output. We can infer that from the rich information on the edges of the smoke images.
+
+ Along with the images we provide the numerical evaluations for each loss. We pick L2, L1, LSiM, MSE, SSIM, Lpips as the methods to compute the numerical distance to the reference image. We compute the average of each metric over 1056 test smoke images. The evaluations agree to our intuition of the images. MSE and LSiM achieve the best score in the evaluation using their selves, while sharing the same score in the SSiM evaluation. Lpips presents the worst performance among the 4 metrics and VGG-16 achieves the best scores in both SSIM evaluation and Lpips evaluation.  
+\subsection{Super-resolution}
 \subsection{Solver in the loop}
 After training lots of models on both buoyancy driven flow and the karman flow of different resolutions, we have following results. In terms of numerical evaluation, we compute the distance of various metrics(L1, L2, MSE, LSiM, SSIM, Lpips) between the simulation corrected by the models trained by different loss functions, and the down-sampled reference simulation. We compute the distance between each corresponding frames pair and compute their average as the result.
 \begin{itemize}
