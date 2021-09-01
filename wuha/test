@@ -1,0 +1,34 @@
+\begin{figure}
+	\centering
+	\begin{subfigure}{0.32\textwidth}
+		\centering
+		\includegraphics[scale=0.49]{karmanflow/l2.png}
+		\caption{L2 evaluation}
+	\end{subfigure}
+	\begin{subfigure}{0.32\textwidth}
+		\centering
+		\includegraphics[scale=0.49]{karmanflow/l1.png}
+		\caption{L1 evaluation}
+	\end{subfigure}
+	\begin{subfigure}{0.32\textwidth}
+		\centering
+		\includegraphics[scale=0.49]{karmanflow/mse.png}
+		\caption{MSE evaluation}
+	\end{subfigure}
+	\begin{subfigure}{0.32\textwidth}
+		\centering
+		\includegraphics[scale=0.49]{karmanflow/lsim.png}
+		\caption{LSiM evaluation}
+	\end{subfigure}
+	\begin{subfigure}{0.32\textwidth}
+		\centering
+		\includegraphics[scale=0.49]{karmanflow/ssim.png}
+		\caption{SSIM evaluation}
+	\end{subfigure}
+	\begin{subfigure}{0.32\textwidth}
+		\centering
+		\includegraphics[scale=0.49]{karmanflow/lpips.png}
+		\caption{Lpips evaluation}
+	\end{subfigure}
+	\caption{Numerical evaluation of each metrics on test set of the super-resolution task}
+\end{figure}

@@ -211,7 +211,7 @@ When we want to perform our fluid simulation on a lower-resolution domain to dec
 
 
 \chapter{Related Work}
-The idea of jumping out of the traditional metrics based on $L^p$ norm has firstly begun by \cite{wang2004}, who developed the structure similarity index. Yet it was still not a perceptual loss and can not extract any deep features of the images. This situation has changed  until the discovery of CNN. Because CNNs are able to extract a lot of deep features structures and patterns from the image datasets (for example in 2014 \cite{simonyan2014very} has proposed the VGG structure which achieve a very good score on the ImageNet challenge), therefore more and more  works tend to use perceptual loss to evaluate their models\cite{amirshahi2016, berardino2017, bosse2016, kang2014, kim2017}. In 2016 \cite{johnson2016perceptual} used intermediate layer comparison from the trained VGG-16 network to evaluate their model for both super-resolution task and style-transfer task.  in 2018 \cite{zhang2018perceptual} developed a new approach to compute the perceptual loss function based on the trained deep CNNs, which, shown in his title, achieved unreasonable effectiveness. In 2020 \cite{kohl2020learning} proposed a new perceptual metric which focused on the numerical evaluation data.
+\paragraph{Perceptual losses related}The idea of jumping out of the traditional metrics based on $L^p$ norm has firstly begun by \cite{wang2004}, who developed the structure similarity index. Yet it was still not a perceptual loss and can not extract any deep features of the images. This situation has changed  until the discovery of CNN. Because CNNs are able to extract a lot of deep features structures and patterns from the image datasets (for example in 2014 \cite{simonyan2014very} has proposed the VGG structure which achieve a very good score on the ImageNet challenge), therefore more and more  works tend to use perceptual loss to evaluate their models\cite{amirshahi2016, berardino2017, bosse2016, kang2014, kim2017}. In 2016 \cite{johnson2016perceptual} used intermediate layer comparison from the trained VGG-16 network to evaluate their model for both super-resolution task and style-transfer task.  in 2018 \cite{zhang2018perceptual} developed a new approach to compute the perceptual loss function based on the trained deep CNNs, which, shown in his title, achieved unreasonable effectiveness. In 2020 \cite{kohl2020learning} proposed a new perceptual metric which focused on the numerical evaluation data.
 
 The PDE model of adopting NS-equation in fluid simulation has firstly been brought up by \cite{doi:10.1063/1.1761178} in 1965. Then PDE models with machine learning started to be popular \cite{crutchfield1987equations,kevrekidis2003equation,brunton2016discovering}. More recently deep learning starting to play an important role in fluid dynamics \cite{kutz2017}. In 2019, \citeauthor{barsinai2019data} successfully integrate deep learning method into advection-diffusion problems to infer stencils. With the development of Phiflow \cite{holl2020learning}, Beside performing physical simulations, we are able to integrate different deep learning backends (Tensorflow and Pytorch), so that we can track the gradient of the vectors that are stored in different grid formats. With the help of Phiflow, \cite{um2020sol} used phiflow based deep learning methods to reduce the numerical error when performing fluid simulations. In 2020 \citeauthor{kim2020lagrangian} developed a neural style transfer approach from images to 3D fluids formulated in a Lagrangian viewpoint. Instead of using grid-based structure, \citeauthor{kim2020lagrangian} used particles for style transfer, which significantly reduce the training time.
 
@@ -286,7 +286,6 @@ VGG-16\cite{simonyan2014very} is originally a CNN-based network trained for imag
 \includegraphics[width=1.0\textwidth]{SystemFigure.pdf}
 \caption{How to extract the intermediate layer outputs of pretrained VGG-16 network to compute the loss.\cite{johnson2016perceptual}}
 \end{figure}
-
 Apart from that we have also tested extracting the first, second or the fourth intermediate layers to calculate the MSE loss in order to compare the performance with the current method. We found out that computing MSE between the third one has the best performance in our training task.
 
 \section{Lpips}
@@ -606,11 +605,471 @@ We train the autoencoder model on density, pressure and velocity data of smokes,
 
  Along with the images we provide the numerical evaluations for each loss. We pick L2, L1, LSiM, MSE, SSIM, Lpips as the methods to compute the numerical distance to the reference image. We compute the average of each metric over 1056 test smoke images. The evaluations agree to our intuition of the images. MSE and LSiM achieve the best score in the evaluation using their selves, while sharing the same score in the SSiM evaluation. Lpips presents the worst performance among the 4 metrics and VGG-16 achieves the best scores in both SSIM evaluation and Lpips evaluation.  
 \subsection{Super-resolution}
+
+\begin{figure}
+	\centering
+	\begin{subfigure}{0.32\textwidth}
+		\centering
+		\includegraphics[scale=0.4]{superresolution/density_low.png}
+		\caption{$Downsampled$}
+	\end{subfigure}
+	\begin{subfigure}{0.32\textwidth}
+		\centering
+		\includegraphics[scale=0.4]{superresolution/density_ref.png}
+		\caption{$Reference$}
+	\end{subfigure}
+	\begin{subfigure}{0.32\textwidth}
+		\centering
+		\includegraphics[scale=0.4]{superresolution/density_mse.png}
+		\caption{$MSE$}
+	\end{subfigure}
+	\begin{subfigure}{0.32\textwidth}
+		\centering
+		\includegraphics[scale=0.4]{superresolution/density_lsim.png}
+		\caption{$LSiM$}
+	\end{subfigure}
+	\begin{subfigure}{0.32\textwidth}
+		\centering
+		\includegraphics[scale=0.4]{superresolution/density_vgg.png}
+		\caption{$VGG-16$}
+	\end{subfigure}
+	\begin{subfigure}{0.32\textwidth}
+		\centering
+		\includegraphics[scale=0.4]{superresolution/density_lpips.png}
+		\caption{$Lpips$}
+	\end{subfigure}
+	\caption{Smoke density images:}
+\end{figure}
+
+\begin{figure}
+	\centering
+	\begin{subfigure}{0.32\textwidth}
+		\centering
+		\includegraphics[scale=0.4]{superresolution/pressure_low.png}
+		\caption{$Downsampled$}
+	\end{subfigure}
+	\begin{subfigure}{0.32\textwidth}
+		\centering
+		\includegraphics[scale=0.4]{superresolution/pressure_ref.png}
+		\caption{$Reference$}
+	\end{subfigure}
+	\begin{subfigure}{0.32\textwidth}
+		\centering
+		\includegraphics[scale=0.4]{superresolution/pressure_mse.png}
+		\caption{$MSE$}
+	\end{subfigure}
+	\begin{subfigure}{0.32\textwidth}
+		\centering
+		\includegraphics[scale=0.4]{superresolution/pressure_lsim.png}
+		\caption{$LSiM$}
+	\end{subfigure}
+	\begin{subfigure}{0.32\textwidth}
+		\centering
+		\includegraphics[scale=0.4]{superresolution/pressure_vgg.png}
+		\caption{$VGG-16$}
+	\end{subfigure}
+	\begin{subfigure}{0.32\textwidth}
+		\centering
+		\includegraphics[scale=0.4]{superresolution/pressure_lpips.png}
+		\caption{$Lpips$}
+	\end{subfigure}
+	\caption{Smoke Pressure images}
+\end{figure}
+
+\begin{figure}
+	\centering
+	\begin{subfigure}{0.32\textwidth}
+		\centering
+		\includegraphics[scale=0.4]{superresolution/liquidvel_low.png}
+		\caption{$Downsampled$}
+	\end{subfigure}
+	\begin{subfigure}{0.32\textwidth}
+		\centering
+		\includegraphics[scale=0.4]{superresolution/liquidvel_ref.png}
+		\caption{$Reference$}
+	\end{subfigure}
+	\begin{subfigure}{0.32\textwidth}
+		\centering
+		\includegraphics[scale=0.4]{superresolution/liquidvel_mse.png}
+		\caption{$MSE$}
+	\end{subfigure}
+	\begin{subfigure}{0.32\textwidth}
+		\centering
+		\includegraphics[scale=0.4]{superresolution/liquidvel_lsim.png}
+		\caption{$LSiM$}
+	\end{subfigure}
+	\begin{subfigure}{0.32\textwidth}
+		\centering
+		\includegraphics[scale=0.4]{superresolution/liquidvel_vgg.png}
+		\caption{$VGG-16$}
+	\end{subfigure}
+	\begin{subfigure}{0.32\textwidth}
+		\centering
+		\includegraphics[scale=0.4]{superresolution/liquidvel_lpips.png}
+		\caption{$Lpips$}
+	\end{subfigure}
+	\caption{Liquid velocity images}
+\end{figure}
+
+\begin{figure}
+	\centering
+	\begin{subfigure}{0.32\textwidth}
+		\centering
+		\includegraphics[scale=0.5]{superresolution/l2.png}
+		\caption{L2 evaluation}
+	\end{subfigure}
+	\begin{subfigure}{0.32\textwidth}
+		\centering
+		\includegraphics[scale=0.5]{superresolution/l1.png}
+		\caption{L1 evaluation}
+	\end{subfigure}
+	\begin{subfigure}{0.32\textwidth}
+		\centering
+		\includegraphics[scale=0.5]{superresolution/mse.png}
+		\caption{MSE evaluation}
+	\end{subfigure}
+	\begin{subfigure}{0.32\textwidth}
+		\centering
+		\includegraphics[scale=0.5]{superresolution/lsim.png}
+		\caption{LSiM evaluation}
+	\end{subfigure}
+	\begin{subfigure}{0.32\textwidth}
+		\centering
+		\includegraphics[scale=0.5]{superresolution/ssim.png}
+		\caption{SSIM evaluation}
+	\end{subfigure}
+	\begin{subfigure}{0.32\textwidth}
+		\centering
+		\includegraphics[scale=0.5]{superresolution/lpips.png}
+		\caption{Lpips evaluation}
+	\end{subfigure}
+	\caption{Numerical evaluation of each metrics on test set of the super-resolution task}
+\end{figure}
+We trained our ImageTransformNet based Super-resolution model on the data combined by smoke and liquid data. Both smoke and liquid data consist of density, velocity and pressure images. We sampled them all in gray scale hence only one channel.
+We can see in terms of smoke density images, every other metrics have some artifacts within the plumes, while LSiM reconstructs the downsampled images well. This problem can be solved if we choose to train our model solely on the smoke density data. However the model will then lose its generality.
+As for the liquid velocity images, we can see that MSE and VGG-16 metrics generate a more blur image compare to the LSiM and Lpips. Because VGG-16 also computes the MSE loss between the intermediate Layers, so these two metrics tend to achieve a blur image to reduce the loss value. The other two metrics LSiM and Lpips, on the other hand, tend to generate a sharper image to approach the reference. In this case, VGG-16 metric achieve the best performance.
+
+We also run the numerical evaluation on all the models we trained. We use 6 metrics to compute the distance between each model outputs and the references. According to the charts, we can tell that Lpips has the worst performance over all metrics, which is similar to the result of the autoencoder task. The other three metrics share the similar results in L2 and SSIM evaluation. VGG-16 achieve the best score in LSiM evaluation, LSiM itself achieve the second best and MSE the third.
+
+
+\begin{figure}
+	\centering
+	\begin{subfigure}{0.32\textwidth}
+		\centering
+		\includegraphics[scale=0.5]{superresolution/checkerboard_mse.png}
+		\caption{MSE output}
+	\end{subfigure}
+	\begin{subfigure}{0.32\textwidth}
+		\centering
+		\includegraphics[scale=0.5]{superresolution/checkerboard_lsim.png}
+		\caption{LSiM output}
+	\end{subfigure}
+	\begin{subfigure}{0.32\textwidth}
+		\centering
+		\includegraphics[scale=0.5]{superresolution/checkerboard_vgg.png}
+		\caption{VGG-16 output}
+	\end{subfigure}
+	\begin{subfigure}{0.32\textwidth}
+		\centering
+		\includegraphics[scale=0.5]{superresolution/checkerboard_ref.png}
+		\caption{Reference}
+	\end{subfigure}
+	\caption{Besides we have also tested the RGB channels model of ImageTransformNet on the density data. We can see when trained with LSiM metric, the output image has very obvious artifacts that tends to divide the images into 9 parts. This problem can be solved by sampling the images in gray scale and adopt the one channel ImageTransformNet model}
+\end{figure}
+
+We have also tested the karman flow data from Solver in the loop in the super-resolution model. 
+\begin{figure}
+	\centering
+	\begin{subfigure}{0.32\textwidth}
+		\centering
+		\includegraphics[scale=0.5]{superresolution/karman_down.png}
+		\caption{$Downsampled$}
+	\end{subfigure}
+	\begin{subfigure}{0.32\textwidth}
+		\centering
+		\includegraphics[scale=0.5]{superresolution/karman_ref.png}
+		\caption{$Reference$}
+	\end{subfigure}
+	\begin{subfigure}{0.32\textwidth}
+		\centering
+		\includegraphics[scale=0.5]{superresolution/karman_mse.png}
+		\caption{$MSE$}
+	\end{subfigure}
+	\begin{subfigure}{0.32\textwidth}
+		\centering
+		\includegraphics[scale=0.5]{superresolution/karman_lsim.png}
+		\caption{$LSiM$}
+	\end{subfigure}
+	\begin{subfigure}{0.32\textwidth}
+		\centering
+		\includegraphics[scale=0.5]{superresolution/karman_vgg.png}
+		\caption{$VGG-16$}
+	\end{subfigure}
+	\begin{subfigure}{0.32\textwidth}
+		\centering
+		\includegraphics[scale=0.5]{superresolution/karman_lpips.png}
+		\caption{$Lpips$}
+	\end{subfigure}
+	\caption{karman flow images comparison}
+\end{figure}
+The numerical evaluation is quite surprising. Despite Lpips outputs have the closest color to the reference, it has the worst score over all the evaluations. LSiM achieve the best score in all evaluations. However intuitively, we can hardly tell the difference between the MSE, LSiM and VGG-16 outputs.
+ 
+\begin{figure}
+	\centering
+	\begin{subfigure}{0.32\textwidth}
+		\centering
+		\includegraphics[scale=0.48]{superresolution/karman_eval_l2.png}
+		\caption{L2 evaluation}
+	\end{subfigure}
+	\begin{subfigure}{0.32\textwidth}
+		\centering
+		\includegraphics[scale=0.48]{superresolution/karman_eval_l1.png}
+		\caption{L1 evaluation}
+	\end{subfigure}
+	\begin{subfigure}{0.32\textwidth}
+		\centering
+		\includegraphics[scale=0.48]{superresolution/karman_eval_mse.png}
+		\caption{MSE evaluation}
+	\end{subfigure}
+	\begin{subfigure}{0.32\textwidth}
+		\centering
+		\includegraphics[scale=0.48]{superresolution/karman_eval_lsim.png}
+		\caption{LSiM evaluation}
+	\end{subfigure}
+	\begin{subfigure}{0.32\textwidth}
+		\centering
+		\includegraphics[scale=0.48]{superresolution/karman_eval_ssim.png}
+		\caption{SSIM evaluation}
+	\end{subfigure}
+	\begin{subfigure}{0.32\textwidth}
+		\centering
+		\includegraphics[scale=0.48]{superresolution/karman_eval_lpips.png}
+		\caption{Lpips evaluation}
+	\end{subfigure}
+	\caption{Numerical evaluation of each metrics on test set of the super-resolution task trained on karman flow data}
+\end{figure}
+
 \subsection{Solver in the loop}
 After training lots of models on both buoyancy driven flow and the karman flow of different resolutions, we have following results. In terms of numerical evaluation, we compute the distance of various metrics(L1, L2, MSE, LSiM, SSIM, Lpips) between the simulation corrected by the models trained by different loss functions, and the down-sampled reference simulation. We compute the distance between each corresponding frames pair and compute their average as the result.
 \begin{itemize}
   \item Karman flow
 \end{itemize}
+
+\begin{figure}
+	\centering
+	\begin{subfigure}{0.18\textwidth}
+		\centering
+		\includegraphics[scale=0.5]{karmanflow/ref_density_000250.png}
+		\caption{$t=250$}
+	\end{subfigure}
+	\begin{subfigure}{0.18\textwidth}
+		\centering
+		\includegraphics[scale=0.5]{karmanflow/ref_density_000500.png}
+		\caption{$t=500$}
+	\end{subfigure}
+	\begin{subfigure}{0.18\textwidth}
+		\centering
+		\includegraphics[scale=0.5]{karmanflow/ref_density_001000.png}
+		\caption{$t=1000$}
+	\end{subfigure}
+	\begin{subfigure}{0.18\textwidth}
+		\centering
+		\includegraphics[scale=0.5]{karmanflow/ref_density_001250.png}
+		\caption{$t=1250$}
+	\end{subfigure}
+	\begin{subfigure}{0.18\textwidth}
+		\centering
+		\includegraphics[scale=0.5]{karmanflow/ref_density_001499.png}
+		\caption{$t=1499$}
+	\end{subfigure}
+	\caption{Karman flow reference simulation}
+\end{figure}
+
+\begin{figure}
+	\centering
+	\begin{subfigure}{0.18\textwidth}
+		\centering
+		\includegraphics[scale=0.5]{karmanflow/source_density_000250.png}
+		\caption{$t=250$}
+	\end{subfigure}
+	\begin{subfigure}{0.18\textwidth}
+		\centering
+		\includegraphics[scale=0.5]{karmanflow/source_density_000500.png}
+		\caption{$t=500$}
+	\end{subfigure}
+	\begin{subfigure}{0.18\textwidth}
+		\centering
+		\includegraphics[scale=0.5]{karmanflow/source_density_001000.png}
+		\caption{$t=1000$}
+	\end{subfigure}
+	\begin{subfigure}{0.18\textwidth}
+		\centering
+		\includegraphics[scale=0.5]{karmanflow/source_density_001250.png}
+		\caption{$t=1250$}
+	\end{subfigure}
+	\begin{subfigure}{0.18\textwidth}
+		\centering
+		\includegraphics[scale=0.5]{karmanflow/source_density_001499.png}
+		\caption{$t=1499$}
+	\end{subfigure}
+	\caption{Karman flow source simulation without correction}
+\end{figure}
+
+\begin{figure}
+	\centering
+	\begin{subfigure}{0.18\textwidth}
+		\centering
+		\includegraphics[scale=0.5]{karmanflow/mse_density_000250.png}
+		\caption{$t=250$}
+	\end{subfigure}
+	\begin{subfigure}{0.18\textwidth}
+		\centering
+		\includegraphics[scale=0.5]{karmanflow/mse_density_000500.png}
+		\caption{$t=500$}
+	\end{subfigure}
+	\begin{subfigure}{0.18\textwidth}
+		\centering
+		\includegraphics[scale=0.5]{karmanflow/mse_density_001000.png}
+		\caption{$t=1000$}
+	\end{subfigure}
+	\begin{subfigure}{0.18\textwidth}
+		\centering
+		\includegraphics[scale=0.5]{karmanflow/mse_density_001250.png}
+		\caption{$t=1250$}
+	\end{subfigure}
+	\begin{subfigure}{0.18\textwidth}
+		\centering
+		\includegraphics[scale=0.5]{karmanflow/mse_density_001499.png}
+		\caption{$t=1499$}
+	\end{subfigure}
+	\caption{Karman flow simulation trained with MSE}
+\end{figure}
+
+\begin{figure}
+	\centering
+	\begin{subfigure}{0.18\textwidth}
+		\centering
+		\includegraphics[scale=0.5]{karmanflow/lsim_density_000250.png}
+		\caption{$t=250$}
+	\end{subfigure}
+	\begin{subfigure}{0.18\textwidth}
+		\centering
+		\includegraphics[scale=0.5]{karmanflow/lsim_density_000500.png}
+		\caption{$t=500$}
+	\end{subfigure}
+	\begin{subfigure}{0.18\textwidth}
+		\centering
+		\includegraphics[scale=0.5]{karmanflow/lsim_density_001000.png}
+		\caption{$t=1000$}
+	\end{subfigure}
+	\begin{subfigure}{0.18\textwidth}
+		\centering
+		\includegraphics[scale=0.5]{karmanflow/lsim_density_001250.png}
+		\caption{$t=1250$}
+	\end{subfigure}
+	\begin{subfigure}{0.18\textwidth}
+		\centering
+		\includegraphics[scale=0.5]{karmanflow/lsim_density_001499.png}
+		\caption{$t=1499$}
+	\end{subfigure}
+	\caption{Karman flow simulation trained with LSiM}
+\end{figure}
+
+\begin{figure}
+	\centering
+	\begin{subfigure}{0.18\textwidth}
+		\centering
+		\includegraphics[scale=0.5]{karmanflow/lpips_density_000250.png}
+		\caption{$t=250$}
+	\end{subfigure}
+	\begin{subfigure}{0.18\textwidth}
+		\centering
+		\includegraphics[scale=0.5]{karmanflow/lpips_density_000500.png}
+		\caption{$t=500$}
+	\end{subfigure}
+	\begin{subfigure}{0.18\textwidth}
+		\centering
+		\includegraphics[scale=0.5]{karmanflow/lpips_density_001000.png}
+		\caption{$t=1000$}
+	\end{subfigure}
+	\begin{subfigure}{0.18\textwidth}
+		\centering
+		\includegraphics[scale=0.5]{karmanflow/lpips_density_001250.png}
+		\caption{$t=1250$}
+	\end{subfigure}
+	\begin{subfigure}{0.18\textwidth}
+		\centering
+		\includegraphics[scale=0.5]{karmanflow/lpips_density_001499.png}
+		\caption{$t=1499$}
+	\end{subfigure}
+	\caption{Karman flow simulation with Lpips}
+\end{figure}
+
+\begin{figure}
+	\centering
+	\begin{subfigure}{0.18\textwidth}
+		\centering
+		\includegraphics[scale=0.5]{karmanflow/vgg_density_000250.png}
+		\caption{$t=250$}
+	\end{subfigure}
+	\begin{subfigure}{0.18\textwidth}
+		\centering
+		\includegraphics[scale=0.5]{karmanflow/vgg_density_000500.png}
+		\caption{$t=500$}
+	\end{subfigure}
+	\begin{subfigure}{0.18\textwidth}
+		\centering
+		\includegraphics[scale=0.5]{karmanflow/vgg_density_001000.png}
+		\caption{$t=1000$}
+	\end{subfigure}
+	\begin{subfigure}{0.18\textwidth}
+		\centering
+		\includegraphics[scale=0.5]{karmanflow/vgg_density_001250.png}
+		\caption{$t=1250$}
+	\end{subfigure}
+	\begin{subfigure}{0.18\textwidth}
+		\centering
+		\includegraphics[scale=0.5]{karmanflow/vgg_density_001499.png}
+		\caption{$t=1499$}
+	\end{subfigure}
+	\caption{Karman flow simulation trained with VGG-16}
+\end{figure}
+
+\begin{figure}
+	\centering
+	\begin{subfigure}{0.32\textwidth}
+		\centering
+		\includegraphics[scale=0.49]{karmanflow/l2.png}
+		\caption{L2 evaluation}
+	\end{subfigure}
+	\begin{subfigure}{0.32\textwidth}
+		\centering
+		\includegraphics[scale=0.49]{karmanflow/l1.png}
+		\caption{L1 evaluation}
+	\end{subfigure}
+	\begin{subfigure}{0.32\textwidth}
+		\centering
+		\includegraphics[scale=0.49]{karmanflow/mse.png}
+		\caption{MSE evaluation}
+	\end{subfigure}
+	\begin{subfigure}{0.32\textwidth}
+		\centering
+		\includegraphics[scale=0.49]{karmanflow/lsim.png}
+		\caption{LSiM evaluation}
+	\end{subfigure}
+	\begin{subfigure}{0.32\textwidth}
+		\centering
+		\includegraphics[scale=0.49]{karmanflow/ssim.png}
+		\caption{SSIM evaluation}
+	\end{subfigure}
+	\begin{subfigure}{0.32\textwidth}
+		\centering
+		\includegraphics[scale=0.49]{karmanflow/lpips.png}
+		\caption{Lpips evaluation}
+	\end{subfigure}
+	\caption{Numerical evaluation of each metrics on test set with the reference}
+\end{figure}
+
 
 \begin{itemize}
   \item Buoyancy driven flow
