@@ -854,6 +854,9 @@ After training lots of models on both buoyancy driven flow and the karman flow o
 \begin{itemize}
   \item Karman flow
 \end{itemize}
+From the comparisons from the figures, we can see that the source simulation has deviated from the reference after 1000 steps. We have also trained in our models only the latter 500 images of the reference karman flow. Lpips obviously has the worst performance, the plume is shifting to the right and there are noticeable artifacts near the obstacle. MSE LSiM and VGG-16 share similar outputs after step 1000.
+
+In our numerical evaluation, we only compare the the simulation frames after step 1000 with their reference frames. We didn't compare the whole 1500 steps because we believe that considering all steps is not suitable since the reference images of the training only come from the latter 500 simulation steps. In terms of L1, L2 and MSE comparisons, we can see all corrected models have better scores than the source simulation. In the other evaluations, LSiM achieved overall the best score, followed by the VGG-16. MSE is not better than the source simulation, which is deviated from \citeauthor{um2020sol}'s work. We think the deviation may come from that we didn't choose a large multi steps in the training and we didn't choose a large training epoch number. Still we prove that LSiM or VGG-16 outperform MSE in terms of this specific task.
 
 \begin{figure}
 	\centering
@@ -1070,6 +1073,78 @@ After training lots of models on both buoyancy driven flow and the karman flow o
 	\caption{Numerical evaluation of each metrics on test set with the reference}
 \end{figure}
 
+We also tested the karman flow on a lower resolution, whose simulation was running on a 64*64 domain.
+The numerical evaluation is a little different than the training on a higher domain. The outputs are similar intuitively, we only show the last frame of each model outputs including the reference and the source simulation.
+We can see on a lower domain, Lpips metric outperform the others, while LSiM is the worst over all 4 metrics. However all the metrics has outperformed the source simulation in terms of MSE L2 SSIM and Lpips evaluation, especially in Lpips and L2(MSE) evaluation, every corrected model has made a strong difference comparing to the source simulation.  
+\begin{figure}
+	\centering
+	\begin{subfigure}{0.32\textwidth}
+		\centering
+		\includegraphics[scale=0.5]{karman_low/ref}
+		\caption{Reference}
+	\end{subfigure}
+	\begin{subfigure}{0.32\textwidth}
+		\centering
+		\includegraphics[scale=0.5]{karman_low/source}
+		\caption{Source}
+	\end{subfigure}
+	\begin{subfigure}{0.32\textwidth}
+		\centering
+		\includegraphics[scale=0.5]{karman_low/mse}
+		\caption{MSE}
+	\end{subfigure}
+	\begin{subfigure}{0.32\textwidth}
+		\centering
+		\includegraphics[scale=0.5]{karman_low/lsim}
+		\caption{LSiM}
+	\end{subfigure}
+	\begin{subfigure}{0.32\textwidth}
+		\centering
+		\includegraphics[scale=0.5]{karman_low/vgg}
+		\caption{VGG-16}
+	\end{subfigure}
+	\begin{subfigure}{0.32\textwidth}
+		\centering
+		\includegraphics[scale=0.5]{karman_low/lpips}
+		\caption{Lpips}
+	\end{subfigure}
+	\caption{Karman flow simulation trained with each metric on the 64*64 domain comparing with the reference}
+\end{figure}
+
+\begin{figure}
+	\centering
+	\begin{subfigure}{0.32\textwidth}
+		\centering
+		\includegraphics[scale=0.49]{karman_low/numeval_l2.png}
+		\caption{L2 evaluation}
+	\end{subfigure}
+	\begin{subfigure}{0.32\textwidth}
+		\centering
+		\includegraphics[scale=0.49]{karman_low/numeval_l1.png}
+		\caption{L1 evaluation}
+	\end{subfigure}
+	\begin{subfigure}{0.32\textwidth}
+		\centering
+		\includegraphics[scale=0.49]{karman_low/numeval_mse.png}
+		\caption{MSE evaluation}
+	\end{subfigure}
+	\begin{subfigure}{0.32\textwidth}
+		\centering
+		\includegraphics[scale=0.49]{karman_low/numeval_lsim.png}
+		\caption{LSiM evaluation}
+	\end{subfigure}
+	\begin{subfigure}{0.32\textwidth}
+		\centering
+		\includegraphics[scale=0.49]{karman_low/numeval_ssim.png}
+		\caption{SSIM evaluation}
+	\end{subfigure}
+	\begin{subfigure}{0.32\textwidth}
+		\centering
+		\includegraphics[scale=0.49]{karman_low/numeval_lpips.png}
+		\caption{Lpips evaluation}
+	\end{subfigure}
+	\caption{Numerical evaluation of each metrics on test set with the reference on the 64*64 domain}
+\end{figure}
 
 \begin{itemize}
   \item Buoyancy driven flow
