@@ -1149,225 +1149,9 @@ We can see on a lower domain, Lpips metric outperform the others, while LSiM is 
 \begin{itemize}
   \item Buoyancy driven flow
 \end{itemize}
-We first pick a dataset from our training set as the test set with renolds number of 2e5(note the renolds numbers of out training set range from 1e5 to 8e5)
-\begin{figure}
-\centering
-\begin{subfigure}{0.18\textwidth}
-  \centering
-  \includegraphics[scale=0.28]{buoyancy/dens_000050_ref.png}
-  \caption{$t=50$}
-\end{subfigure}
-\begin{subfigure}{0.18\textwidth}
-  \centering
-  \includegraphics[scale=0.28]{buoyancy/dens_000100_ref.png}
-  \caption{$t=100$}
-\end{subfigure}
-\begin{subfigure}{0.18\textwidth}
-  \centering
-  \includegraphics[scale=0.28]{buoyancy/dens_000150_ref.png}
-  \caption{$t=150$}
-\end{subfigure}
-\begin{subfigure}{0.18\textwidth}
-  \centering
-  \includegraphics[scale=0.28]{buoyancy/dens_000200_ref.png}
-  \caption{$t=200$}
-\end{subfigure}
-\begin{subfigure}{0.18\textwidth}
-  \centering
-  \includegraphics[scale=0.28]{buoyancy/dens_000249_ref.png}
-  \caption{$t=250$}
-\end{subfigure}
-\caption{Reference simulation}
-\end{figure}
+We first run the evaluation on a test set of the buoyancy driven flow on the higher domain(128*128). We can see from the simulation images, the corrected simulation can hardly approach the shape of the reference images. Only the corrected simulation trained by Lpips shares a little similarity with the reference. The same concept is also revealed in the numerical evaluation of these models. Except Lpips, other metrics can not even outperform the uncorrected source simulation. 
 
-
-\begin{figure}
-\centering
-\begin{subfigure}{0.18\textwidth}
-  \centering
-  \includegraphics[scale=0.56]{buoyancy/dens_000050_src.png}
-  \caption{$t=50$}
-\end{subfigure}
-\begin{subfigure}{0.18\textwidth}
-  \centering
-  \includegraphics[scale=0.56]{buoyancy/dens_000100_src.png}
-  \caption{$t=100$}
-\end{subfigure}
-\begin{subfigure}{0.18\textwidth}
-  \centering
-  \includegraphics[scale=0.56]{buoyancy/dens_000150_src.png}
-  \caption{$t=150$}
-\end{subfigure}
-\begin{subfigure}{0.18\textwidth}
-  \centering
-  \includegraphics[scale=0.56]{buoyancy/dens_000200_src.png}
-  \caption{$t=200$}
-\end{subfigure}
-\begin{subfigure}{0.18\textwidth}
-  \centering
-  \includegraphics[scale=0.56]{buoyancy/dens_000249_src.png}
-  \caption{$t=250$}
-\end{subfigure}
-\caption{Source simulation}
-\end{figure}
-
-\begin{figure}
-\centering
-\begin{subfigure}{0.18\textwidth}
-  \centering
-  \includegraphics[scale=0.56]{buoyancy/dens_000050_lsim.png}
-  \caption{$t=50$}
-\end{subfigure}
-\begin{subfigure}{0.18\textwidth}
-  \centering
-  \includegraphics[scale=0.56]{buoyancy/dens_000100_lsim.png}
-  \caption{$t=100$}
-\end{subfigure}
-\begin{subfigure}{0.18\textwidth}
-  \centering
-  \includegraphics[scale=0.56]{buoyancy/dens_000150_lsim.png}
-  \caption{$t=150$}
-\end{subfigure}
-\begin{subfigure}{0.18\textwidth}
-  \centering
-  \includegraphics[scale=0.56]{buoyancy/dens_000200_lsim.png}
-  \caption{$t=200$}
-\end{subfigure}
-\begin{subfigure}{0.18\textwidth}
-  \centering
-  \includegraphics[scale=0.56]{buoyancy/dens_000249_lsim.png}
-  \caption{$t=250$}
-\end{subfigure}
-\caption{simulation with lsim}
-\end{figure}
-
-\begin{figure}
-\centering
-\begin{subfigure}{0.18\textwidth}
-  \centering
-  \includegraphics[scale=0.56]{buoyancy/dens_000050_mse.png}
-  \caption{$t=50$}
-\end{subfigure}
-\begin{subfigure}{0.18\textwidth}
-  \centering
-  \includegraphics[scale=0.56]{buoyancy/dens_000100_mse.png}
-  \caption{$t=100$}
-\end{subfigure}
-\begin{subfigure}{0.18\textwidth}
-  \centering
-  \includegraphics[scale=0.56]{buoyancy/dens_000150_mse.png}
-  \caption{$t=150$}
-\end{subfigure}
-\begin{subfigure}{0.18\textwidth}
-  \centering
-  \includegraphics[scale=0.56]{buoyancy/dens_000200_mse.png}
-  \caption{$t=200$}
-\end{subfigure}
-\begin{subfigure}{0.18\textwidth}
-  \centering
-  \includegraphics[scale=0.56]{buoyancy/dens_000249_mse.png}
-  \caption{$t=250$}
-\end{subfigure}
-\caption{simulation with mse}
-\end{figure}
-
-\begin{figure}
-\centering
-\begin{subfigure}{0.18\textwidth}
-  \centering
-  \includegraphics[scale=0.56]{buoyancy/dens_000050_vgg.png}
-  \caption{$t=50$}
-\end{subfigure}
-\begin{subfigure}{0.18\textwidth}
-  \centering
-  \includegraphics[scale=0.56]{buoyancy/dens_000100_vgg.png}
-  \caption{$t=100$}
-\end{subfigure}
-\begin{subfigure}{0.18\textwidth}
-  \centering
-  \includegraphics[scale=0.56]{buoyancy/dens_000150_vgg.png}
-  \caption{$t=150$}
-\end{subfigure}
-\begin{subfigure}{0.18\textwidth}
-  \centering
-  \includegraphics[scale=0.56]{buoyancy/dens_000200_vgg.png}
-  \caption{$t=200$}
-\end{subfigure}
-\begin{subfigure}{0.18\textwidth}
-  \centering
-  \includegraphics[scale=0.56]{buoyancy/dens_000249_vgg.png}
-  \caption{$t=250$}
-\end{subfigure}
-\caption{simulation with vgg}
-\end{figure}
-
-\begin{figure}
-\centering
-\begin{subfigure}{0.18\textwidth}
-  \centering
-  \includegraphics[scale=0.56]{buoyancy/dens_000050_lpips.png}
-  \caption{$t=50$}
-\end{subfigure}
-\begin{subfigure}{0.18\textwidth}
-  \centering
-  \includegraphics[scale=0.56]{buoyancy/dens_000100_lpips.png}
-  \caption{$t=100$}
-\end{subfigure}
-\begin{subfigure}{0.18\textwidth}
-  \centering
-  \includegraphics[scale=0.56]{buoyancy/dens_000150_lpips.png}
-  \caption{$t=150$}
-\end{subfigure}
-\begin{subfigure}{0.18\textwidth}
-  \centering
-  \includegraphics[scale=0.56]{buoyancy/dens_000200_lpips.png}
-  \caption{$t=200$}
-\end{subfigure}
-\begin{subfigure}{0.18\textwidth}
-  \centering
-  \includegraphics[scale=0.56]{buoyancy/dens_000249_lpips.png}
-  \caption{$t=250$}
-\end{subfigure}
-\caption{simulation with lpips}
-\end{figure}
-
-\begin{figure}
-\centering
-\begin{subfigure}{0.49\textwidth}
-  \centering
-  \includegraphics[scale=0.4]{buoyancy/l2.png}
-  \caption{l2 evaluation}
-\end{subfigure}
-\begin{subfigure}{0.49\textwidth}
-  \centering
-  \includegraphics[scale=0.4]{buoyancy/l1.png}
-  \caption{l1 evaluation}
-\end{subfigure}
-\begin{subfigure}{0.49\textwidth}
-  \centering
-  \includegraphics[scale=0.4]{buoyancy/mse.png}
-  \caption{mse evaluation}
-\end{subfigure}
-\begin{subfigure}{0.49\textwidth}
-  \centering
-  \includegraphics[scale=0.4]{buoyancy/lsim.png}
-  \caption{lsim evaluation}
-\end{subfigure}
-\begin{subfigure}{0.49\textwidth}
-  \centering
-  \includegraphics[scale=0.4]{buoyancy/ssim.png}
-  \caption{ssim evaluation}
-\end{subfigure}
-\begin{subfigure}{0.49\textwidth}
-  \centering
-  \includegraphics[scale=0.4]{buoyancy/lpips.png}
-  \caption{lpips evaluation}
-\end{subfigure}
-\caption{Numerical evaluation of each metrics on training set}
-\end{figure}
-
-
-However when we generate a test set with the renolds number of 2.5e5 which was not included in the training set, the results are then different.
+For completeness we also turn to the buoyancy driven flow on the lower domain(64*64), the result is similar or even worse. We can see from the numerical evaluation, except for the LSiM evaluation, the source simulation outperform all the corrected simulation. However, if we only look at the comparisons between the corrected simulation, we can see that generally LSiM and VGG-16 metrics achieve better scores than the MSE
 \begin{figure}
 \centering
 \begin{subfigure}{0.18\textwidth}
@@ -1547,6 +1331,114 @@ However when we generate a test set with the renolds number of 2.5e5 which was n
 \end{subfigure}
 \caption{simulation with lpips}
 \end{figure}
+
+\begin{figure}
+	\centering
+	\begin{subfigure}{0.32\textwidth}
+		\centering
+		\includegraphics[scale=0.48]{buoyancy_test/l2.png}
+		\caption{l2 evaluation}
+	\end{subfigure}
+	\begin{subfigure}{0.32\textwidth}
+		\centering
+		\includegraphics[scale=0.48]{buoyancy_test/l1.png}
+		\caption{l1 evaluation}
+	\end{subfigure}
+	\begin{subfigure}{0.32\textwidth}
+		\centering
+		\includegraphics[scale=0.48]{buoyancy_test/mse.png}
+		\caption{mse evaluation}
+	\end{subfigure}
+	\begin{subfigure}{0.32\textwidth}
+		\centering
+		\includegraphics[scale=0.48]{buoyancy_test/lsim.png}
+		\caption{lsim evaluation}
+	\end{subfigure}
+	\begin{subfigure}{0.32\textwidth}
+		\centering
+		\includegraphics[scale=0.48]{buoyancy_test/ssim.png}
+		\caption{ssim evaluation}
+	\end{subfigure}
+	\begin{subfigure}{0.32\textwidth}
+		\centering
+		\includegraphics[scale=0.48]{buoyancy_test/lpips.png}
+		\caption{lpips evaluation}
+	\end{subfigure}
+	\caption{Numerical evaluation of each metrics on test set of buoyancy driven flow with the domain resolution of 128*128 with Renold's number=2.5e5}
+		\end{figure}
+	
+	
+	
+	\begin{figure}
+		\centering
+		\begin{subfigure}{0.32\textwidth}
+			\centering
+			\includegraphics[scale=0.5]{buoyancy_low/ref}
+			\caption{Reference at $t=149$}
+		\end{subfigure}
+		\begin{subfigure}{0.32\textwidth}
+			\centering
+			\includegraphics[scale=0.5]{buoyancy_low/source}
+			\caption{Source at $t=149$}
+		\end{subfigure}
+		\begin{subfigure}{0.32\textwidth}
+			\centering
+			\includegraphics[scale=0.5]{buoyancy_low/mse}
+			\caption{MSE at $t=149$}
+		\end{subfigure}
+		\begin{subfigure}{0.32\textwidth}
+			\centering
+			\includegraphics[scale=0.5]{buoyancy_low/lsim}
+			\caption{LSiM at $t=149$}
+		\end{subfigure}
+		\begin{subfigure}{0.32\textwidth}
+			\centering
+			\includegraphics[scale=0.5]{buoyancy_low/vgg}
+			\caption{VGG-16 at $t=149$}
+		\end{subfigure}
+		\begin{subfigure}{0.32\textwidth}
+			\centering
+			\includegraphics[scale=0.5]{buoyancy_low/lpips}
+			\caption{Lpips at $t=149$}
+		\end{subfigure}
+		\caption{Buoyancy driven flow simulation trained with each metric on the 64*64 domain comparing with the reference and the source}
+	\end{figure}
+	
+	\begin{figure}
+		\centering
+		\begin{subfigure}{0.32\textwidth}
+			\centering
+			\includegraphics[scale=0.49]{buoyancy_low/l2.png}
+			\caption{L2 evaluation}
+		\end{subfigure}
+		\begin{subfigure}{0.32\textwidth}
+			\centering
+			\includegraphics[scale=0.49]{buoyancy_low/l1.png}
+			\caption{L1 evaluation}
+		\end{subfigure}
+		\begin{subfigure}{0.32\textwidth}
+			\centering
+			\includegraphics[scale=0.49]{buoyancy_low/mse_eval.png}
+			\caption{MSE evaluation}
+		\end{subfigure}
+		\begin{subfigure}{0.32\textwidth}
+			\centering
+			\includegraphics[scale=0.49]{buoyancy_low/lsim_eval.png}
+			\caption{LSiM evaluation}
+		\end{subfigure}
+		\begin{subfigure}{0.32\textwidth}
+			\centering
+			\includegraphics[scale=0.49]{buoyancy_low/ssim.png}
+			\caption{SSIM evaluation}
+		\end{subfigure}
+		\begin{subfigure}{0.32\textwidth}
+			\centering
+			\includegraphics[scale=0.49]{buoyancy_low/lpips_eval.png}
+			\caption{Lpips evaluation}
+		\end{subfigure}
+		\caption{Numerical evaluation of each metrics on test set with the reference on the 64*64 domain}
+	\end{figure}
+
 \subsection{Time cost evaluation}
 
 \section{Limitaions}
