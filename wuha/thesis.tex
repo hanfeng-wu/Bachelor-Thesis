@@ -1440,6 +1440,72 @@ For completeness we also turn to the buoyancy driven flow on the lower domain(64
 	\end{figure}
 
 \subsection{Time cost evaluation}
+In this evaluation we combined the SOL model and the super-resolution model for karman flow on the domain of 64*64. We want to demonstrate the time cost and the quality difference between
+\begin{itemize}
+	\item running  the pure physical simulation on the higher domain, without any deep learning models involved
+	\item running first the corrected physical simulation on the lower domain by the pretrained SOL model and then super-resolute the outputs to the same resolution of the higher domain 
+\end{itemize}
+the outputs are quite satisfying. We can see barely any artifacts from the outputs and the simulation is similar to the reference. We average the time cost of generating the 2 simulations. We have 14 min 6 sec on average for generating 1500 images of the reference and 4 min 23 sec for generating the second simulation. The time cost reduced by 70\% if we choose to generate a corrected low-resolution simulation and adopt the super-resolution model rather than performing the pure physical simulation on the higher-resolution domain. Meanwhile, the outputs are similar in terms of both the quality and the shape of the plumes.  
+
+\begin{figure}
+	\centering
+	\begin{subfigure}{0.18\textwidth}
+		\centering
+		\includegraphics[scale=0.3]{timecost/ref250.png}
+		\caption{$t=250$}
+	\end{subfigure}
+	\begin{subfigure}{0.18\textwidth}
+		\centering
+		\includegraphics[scale=0.3]{timecost/ref500.png}
+		\caption{$t=500$}
+	\end{subfigure}
+	\begin{subfigure}{0.18\textwidth}
+		\centering
+		\includegraphics[scale=0.3]{timecost/ref1000.png}
+		\caption{$t=1000$}
+	\end{subfigure}
+	\begin{subfigure}{0.18\textwidth}
+		\centering
+		\includegraphics[scale=0.3]{timecost/ref1250.png}
+		\caption{$t=1250$}
+	\end{subfigure}
+	\begin{subfigure}{0.18\textwidth}
+		\centering
+		\includegraphics[scale=0.3]{timecost/ref1499.png}
+		\caption{$t=1499$}
+	\end{subfigure}
+	\caption{Karman flow reference simulation}
+\end{figure}
+
+\begin{figure}
+	\centering
+	\begin{subfigure}{0.18\textwidth}
+		\centering
+		\includegraphics[scale=0.3]{timecost/low250.png}
+		\caption{$t=250$}
+	\end{subfigure}
+	\begin{subfigure}{0.18\textwidth}
+		\centering
+		\includegraphics[scale=0.3]{timecost/low500.png}
+		\caption{$t=500$}
+	\end{subfigure}
+	\begin{subfigure}{0.18\textwidth}
+		\centering
+		\includegraphics[scale=0.3]{timecost/low1000.png}
+		\caption{$t=1000$}
+	\end{subfigure}
+	\begin{subfigure}{0.18\textwidth}
+		\centering
+		\includegraphics[scale=0.3]{timecost/low1250.png}
+		\caption{$t=1250$}
+	\end{subfigure}
+	\begin{subfigure}{0.18\textwidth}
+		\centering
+		\includegraphics[scale=0.3]{timecost/low1499.png}
+		\caption{$t=1499$}
+	\end{subfigure}
+	\caption{Karman flow low simulation + SOL model + super-resolution model}
+\end{figure}
 
 \section{Limitaions}
 
@@ -1452,6 +1518,7 @@ For completeness we also turn to the buoyancy driven flow on the lower domain(64
 \chapter{Conclusion}
 \section{Future work}
 \section{Summary}
+In this thesis, we successfully proved the advantage of using perceptual losses in some fluid simulation related tasks. However, in some tasks, using perceptual losses is not necessarily better than using traditional loss functions.
 
 
 
