@@ -93,11 +93,25 @@ Eventually we combine the results of Solver in the Loop and super-resolution mod
 \selectlanguage{german}
 \begin{abstract}
 
-Diese Arbeit untersucht die Integration von Percaptual Losses in verschiedeneMethoden oder Ansätze, die im Zusammenhang mit Fluidsimulationen stehen.Perceptual Losses werden verwendet, um großflächige Unterschiede zuvergleichen, während herkömmliche Loss Funktionen nur Unterschiede aufPixelebene zuverlässig berechnen können.
+Diese Arbeit untersucht die Integration von Percaptual Losses in verschiedene
+Methoden oder Ansätze, die im Zusammenhang mit Fluidsimulationen stehen.
+Perceptual Losses werden verwendet, um großflächige Unterschiede zu
+vergleichen, während herkömmliche Loss Funktionen nur Unterschiede auf
+Pixelebene zuverlässig berechnen können.
 
-Zunächst werden einige allgemeine Konzepte von Fluidsimulationen undDeep Learning erläutert. Anschließend werden bisherige Publikationen zu Perceptual Lossesdiskutiert, die sich hauptsächlich auf Aufgaben aus der Bildverarbeitung konzentrieren, wie etwa  \cite{johnson2016perceptual, amirshahi2016, berardino2017, bosse2016, kang2014, kim2017}. Als nächstes werden gängie Methodenfür den Datenvergleich, der ein wesentlicher Aspekt jedes Perceptual Lossesist, verglichen und deren Eigenschaften hervorgehoben. Danacherklären wir detailiert die verschiedenen Aufgaben auf die wir uns konzentrieren,wie Solver in the Loop und super-resolution. Dann integrieren wir in den Experimenten Perceptual Losses in diese Aufgaben, um zu zeigen, dassim Kontext von Fluidsimulation die Integration einiger Perceptual Losses traditionelleFormulierungen von Losses übertrifft.
+Zunächst werden einige allgemeine Konzepte von Fluidsimulationen und
+Deep Learning erläutert. Anschließend werden bisherige Publikationen zu Perceptual Losses
+diskutiert, die sich hauptsächlich auf Aufgaben aus der Bildverarbeitung konzentrieren, wie etwa  \cite{johnson2016perceptual, amirshahi2016, berardino2017, bosse2016, kang2014, kim2017}. Als nächstes werden gängie Methoden
+für den Datenvergleich, der ein wesentlicher Aspekt jedes Perceptual Losses
+ist, verglichen und deren Eigenschaften hervorgehoben. Danach
+erklären wir detailiert die verschiedenen Aufgaben auf die wir uns konzentrieren,
+wie Solver in the Loop und super-resolution. Dann integrieren wir in den Experimenten Perceptual Losses in diese Aufgaben, um zu zeigen, dass
+im Kontext von Fluidsimulation die Integration einiger Perceptual Losses traditionelle
+Formulierungen von Losses übertrifft.
 
-Abschließend kombinieren wir die Ergebnisse von den Modellen für Solver in the Loop undsuper-resolution, um im Vergleich zu einer herkömmlichen Fluidsimulationeine geringere Laufzeit zu erzielen. 
+Abschließend kombinieren wir die Ergebnisse von den Modellen für Solver in the Loop und
+super-resolution, um im Vergleich zu einer herkömmlichen Fluidsimulation
+eine geringere Laufzeit zu erzielen. 
 %abstract german
 
 \end{abstract}
@@ -130,7 +144,7 @@ Abschließend kombinieren wir die Ergebnisse von den Modellen für Solver in the
 
 Our main purpose of this thesis is to demonstrate the advantage of adopting the perceptual loss functions in various deep learning tasks on fluid simulation. We try to show quantitatively and qualitatively that by integrating suitable perceptual loss functions in such tasks can outperform the original model trained on traditional loss functions such as MSE.  First we want to give a brief introduction to the core concepts of fluid simulation and their related tasks with deep learning techniques.
 \section{Fluid simulation}
-\subsection{Navier Stokes Equation}
+\subsection{Navier-Stokes equations}
 The state-of-the-art fluid simulation is based on the famous incompressible equation Navier-Stokes equations
 
 \begin{equation}
@@ -141,12 +155,12 @@ The state-of-the-art fluid simulation is based on the famous incompressible equa
 {\nabla}\cdot\vec{u} = 0
 \end{equation}
 
-where $\nabla$ denotes the gradient, $\nabla\cdot$ denotes the Divergence, $\vec{u}$ denotes the velocity of the fluid, $t$ denotes the time step, $\rho$ denotes the density of the fluid, $p$ denotes the pressure, $\vec{g}$ denotes the gravity and $\nu$ denotes the viscosity of the fluid.
+where $\nabla$ denotes the gradient, $\nabla\cdot$ denotes the divergence, $\vec{u}$ denotes the velocity of the fluid, $t$ denotes the time step, $\rho$ denotes the density of the fluid, $p$ denotes the pressure, $\vec{g}$ denotes the gravity and $\nu$ denotes the viscosity of the fluid.
 
-The equation (1.1) is actually a transformation of the $\vec{F} = m\vec{a}$ and the equation (1.2) describes the incompressibility of the fluid. There are two ways to regard the fluid in the simulation, which are Lagrangian point of view and Eulerian point of  view. Lagrangian point view focuses on the behavior of the fluid parcels, while Eulerian point of view focuses on the velocity fields, pressure fields that vary in time and space. We prefer to use Lagrangian point of view because the existing NS-equations focus more on the physical properties of the fluid parcel rather than describing the mathematical properties of the field.  In order to adopt the Lagrangian point of view, we need a grid structure to store the properties of our fluid parcels.
+The equation (1.1) is actually a transformation of the $\vec{F} = m\vec{a}$\cite{fluidnotes} and the equation (1.2) describes the incompressibility of the fluid. There are two ways to regard the fluid in the simulation, which are Lagrangian point of view and Eulerian point of  view. Lagrangian point view focuses on the behavior of the fluid parcels, while Eulerian point of view focuses on the velocity fields, pressure fields that vary in time and space. We prefer to use Lagrangian point of view because the existing NS-equations focus more on the physical properties of the fluid parcel rather than describing the mathematical properties of the field.  In order to adopt the Lagrangian point of view, we need a grid structure to store the properties of our fluid parcels.
 
 \subsection{Grid Stucture}
-The way of storing the velocity and the density is based on two different grid structure. We store the density in the center of each cell, we call it centeredgrid or scalar grid. However for storing the velocity, we sample them at the face centers of each cell\cite{doi:10.1063/1.1761178}, while the pressure is stored in the center of each grid. In such way we can more easily compute the inflow and outflow of each grid for each direction. As a trade off for such grid structure, the data format would be more complex than normal centeredgrid. We usually have to stack each velocity array of each dimension together and also adopt them individually in some computations(e.g. computing loss function in deep learning)
+The way of storing the velocity and the density is based on two different grid structure. We store the density in the center of each cell, we call it centered grid or scalar grid. However for storing the velocity, we sample them at the face centers of each cell\cite{doi:10.1063/1.1761178}, while the pressure is stored in the center of each grid. In such way we can more easily compute the inflow and outflow of each grid for each direction. As a trade off for such grid structure, the data format would be more complex than normal centered grid. We usually have to stack each velocity array of each dimension together and also adopt them individually in some computations(e.g. computing loss function in deep learning)
 
 \begin{figure}[h]
 \centering
@@ -194,7 +208,7 @@ with all the knowledge above, we can formulate a sequence to conduct the basic f
 \section{Deep learning tasks}
 In this section, we introduce several fluid simulation related tasks which we focus on in this thesis.
 \subsection{Autoencoder}
-The Autoencoder model has a bottle neck shape, which aims to produce the same output as the input. Once trained, the Autoencoder model can be separated into two parts, namely the encoder and the decoder, which can compress the image with the encoder and later decompress the image with the decoder to its former shape.
+The Autoencoder model has a bottleneck shape, which aims to produce the same output as the input. Once trained, the Autoencoder model can be separated into two parts, namely the encoder and the decoder, which can compress the image with the encoder and later decompress the image with the decoder to its former shape.
 \subsection{Super-resolution}
 With the super-resolution model, we can upscale the low-resolution images to high-resolution images. The model is able to up-sample fluid simulation images if we feed similar data to train the model. In this paper, we apply the super-resolution model at the end of the Solver in the Loop model in order to boost the fluid simulation. Meanwhile, the simulation still obtain a similar output to the traditional simulation.
 \subsection{Solver in the Loop}
@@ -230,7 +244,7 @@ Besides, MSE computes the square error of the two tensors, which means that MSE 
 \begin{subfigure}{0.4\textwidth}
   \centering
   \includegraphics[scale=0.5]{MSEref.png}
-  \caption{ref}
+  \caption{Reference}
 \end{subfigure}
 \begin{subfigure}{0.4\textwidth}
   \centering
@@ -285,7 +299,7 @@ VGG-16\cite{simonyan2014very} is originally a CNN-based network trained for imag
 Apart from that we have also tested extracting the first, second or the fourth intermediate layers to calculate the MSE loss in order to compare the performance with the current method. We found out that computing MSE between the third one has the best performance in our training task.
 
 \section{Lpips}
-Lpips as in Learned Perceptual Image Patch Similarity\cite{zhang2018perceptual} is also a trained network to compare the high level image features based on various distortions. According to the author, they adopted distortions like CNN-based distortions, super-resolution, frame interpolation and so on for the dataset. Based on that, they use several psychophysical similarity measurements on the dataset, trying to approach the human judgements to the images. For the network architecture, they evaluate the SqueezeNet, AlexNet, and VGG architectures. We can consider Lpips as a advanced version of VGG-16, because we do not only consider certain intermediate layer outputs, moreover we take advantage of more intermediate layer outputs and the perceptual judgement, which will be a more reliable than just computing their MSE difference. We in this project choose to use the AlexNet based Lpips.
+Lpips as in Learned Perceptual Image Patch Similarity\cite{zhang2018perceptual} is also a trained network to compare the high level image features based on various distortions. According to the author, they adopted distortions like CNN-based distortions, super-resolution, frame interpolation and so on for the datasets. Based on that, they use several psychophysical similarity measurements on the datasets, trying to approach the human judgements to the images. For the network architecture, they evaluate the SqueezeNet, AlexNet, and VGG architectures. We can consider Lpips as an advanced version of VGG-16, because we do not only consider certain intermediate layer outputs, moreover we take advantage of more intermediate layer outputs and the perceptual judgement, which will be a more reliable than just computing their MSE difference. We in this project choose to use the AlexNet based Lpips.
 \begin{figure}
 \centering
 \includegraphics[width=1.0\textwidth]{network_lpips.pdf}
@@ -307,7 +321,7 @@ We set up the Autoencoder mainly to have a rough overview of the performance of 
 
 Autoencoder can be trained without supervision, because the training data is exactly the reference, so we do not need to do any modification to complete the training. However, in order to accelerate the training, we made 2 following modifications:
 \begin{itemize}
-\item since the numerical simulation data are mostly gray scale, which means we can sample them with one channel to boost our training and replicate the channel when certain loss functions demand their inputs in RGB channels. Such techniques can also be applied on any models with grayscale data, you can see more details about it in the Section 5.2.2.
+\item since the numerical simulation data are mostly gray scale, which means we can sample them with one channel to boost our training and replicate the channel when certain loss functions demand their inputs in RGB channels. Such techniques can also be applied on any models with gray scale data, you can see more details about it in the Section 5.1.2.
 \item in order to reduce the GPU usage, we downsample the 256*256 training data to the size of 128*128.
 
 \end{itemize}
@@ -335,7 +349,7 @@ The data we used in the super-resolution task came from various sources. We firs
 \caption{Training set of LSiM model}
 \end{figure}
 
-We also want to test the performance of combining Solver in the Loop and super-resolution together to compete against the time cost with performing the simulation purely on the higher domain. Therefore we also feed the training data of the Solver in the Loop to the super-resolution model, so that our model can learn to super sample the plume density images when we feed the corrected simulation images on the lower domain. In this way, we are able to abtain the plume images with the same resolution as the higher domain.Apart from that, we also test the our model performance on some random videos data which are not related to numerical simulations but still can be of some assistance to our model.
+We also want to test the performance of combining Solver in the Loop and super-resolution together to compete the time cost against the simulation performing purely on the higher domain. Therefore we also feed the training data of the Solver in the Loop to the super-resolution model, so that our model can learn to super sample the plume density images when we feed the corrected simulation images on the lower domain. In this way, we are able to abtain the plume images with the same resolution as the higher domain. Apart from that, we also test the our model performance on some random videos data which are not related to numerical simulations but still can be of some assistance to our model.
 
 To create the data set, we form a dictionary for each image. We first downsample each training image $I_{high}$ to a lower resolution image $I_{downsampled}$(e.g. images of 256*256 to image of 64*64), then we resize the $I_{downsampled}$ to the same image size of the previous $I_{high}$, then we get a image $I_{low}$ with the same image size but a lower resolution as the $I_{high}$. In the training process we treat the $I_{low}$ as the input data of the model, $I_{high}$ as the groud truth to compute the loss with the model output.
 \section{Solver in the Loop}
@@ -373,7 +387,7 @@ For both simulation tasks, we have prepared two datasets with different resoluti
 \end{subfigure}
 \caption{Reference images generation and downsampling}
 \end{figure}
-\subsection{Phiflow setup}
+\subsection{Generation of datasets}
 The tool we used to perform the fluid simulation is Phiflow\cite{holl2020learning}. 
 
 For the karmanflow generation, we define an open domain with the size of 200(height) * 100(width)\footnote{notice that domain size is not the same concept as the domain resolution. The domain size helps to locate the position of the inflow and obstacles of the simulation, while the resolution is used to define how percise we should sample our domain. Hence we could perform different resolution formats on the same domain size.} we set the inflow as a 5 * 50 rectangle at the top center, and the obstacle as a circle with radius 10 positioned in the very center of the upper half of the domain. The step size $\Delta t$ we chose here is 1.0. For each simulation we chose to generate 1500 frames for the karman flow.
@@ -398,9 +412,9 @@ For both tasks, we have a total of 8 simulations with their renolds numbers rang
 
 \section{Autoencoder}
 \subsection{Network}
-We used a very simple bottle-neck like and fully convolutional neural network for the Autoencoder(see figure 5.1). Due to the gray scale images, the input and output channel size is set to 1. We apply two convolution layers followed by one max pooling layer and two upsample convolution layer. In order to keep the tensor value within a reasonable range, we add before the final output a 256*sigmoid layer to ensure that every output value should lie in between [0, 255]. However sigmoid should not be used in the intermediate layers, which will cause vanishing gradient problem, so we use ReLU as the activation function for the intermediate layer. The reason why we do not add a ReLU activation function before the sigmoid is because the ReLU only outputs positive values which wil results in that the sigmoid function will then only output values greater then 0.5, then we will lose half of the value range of the images which is not acceptable.
+We use a very simple bottleneck like and fully convolutional neural network for the Autoencoder(see figure \ref{autoencoder}). Due to the gray scale images, the input and output channel size is set to 1. We apply two convolution layers followed by one max pooling layer and two upsample convolution layer. In order to keep the tensor value within a reasonable range, we add before the final output a 256*sigmoid layer to ensure that every output value should lie in between [0, 255]. However sigmoid should not be used in the intermediate layers, which will cause vanishing gradient problem, so we use ReLU as the activation function for the intermediate layer. The reason why we do not add a ReLU activation function before the sigmoid is because the ReLU only outputs positive values which will results in that the sigmoid function only outputs values greater than 0.5, then we will lose half of the value range of the images which is not acceptable.
 \subsection{Application of loss functions}
-Before feeding the input image to the model and compute the loss function, we can still add on some modification to make our training eaiser. Since most of our data are smoke images or velocity fields, so they are in gray scale. In this case, we can modify our network in the way that the new input channel size and the output channel size are 1, because the gray scale images only have one channel. With this modification, our model does not need to learn to align all the three RGB channels to the same value, hence it will strongly reduce the training difficulty. However, in the process of applying the loss function, there will be the problem that many of the perceptual loss functions only accept RGB images that the input tensors should have three channels. In order to fix this, we choose to replicate the channel size to three with the same value, so the loss functions will regard our gray scale images as RGB images. In this way we keep the tensors in the training process as one-channel tensors however in the loss function computation process as three-channels tensors, which increase our model performance.
+Before feeding the input image to the model and compute the loss function, we can still add on some modifications to make our training easier. Since most of our data are smoke images or velocity fields, so they are in gray scale. In this case, we can modify our network in a way that the new input channel size and the output channel size are 1, because the gray scale images only have one channel. With this modification, our model does not need to learn to align all the three RGB channels to the same value, hence it will strongly reduce the training difficulty. However, in the process of applying the loss function, there will be the problem that many of the perceptual loss functions only accept RGB images, which means the input tensors should have three channels. In order to fix this, we choose to replicate the channel size to three with the same value, so the loss functions will regard our gray scale images as RGB images. In this way we keep the tensors in the training process as one-channel tensors however in the loss function computation process as three-channels tensors, which increase our model performance.
 
 In order to compute the loss functions, we need to define the reference and the model output. Now we know our first input is the model output with replicated channels, and the reference input should be the $I_{high}$. The rest is to define the respective metrics. For MSE loss we can directly compute it between two tensors. For VGG-16 loss function, we can feed each tensor into the model and compute MSE loss between their third intermediate outputs. For LSiM we can form a dictionary of these two tensors and pass it to the forward function of the LSiM model. For Lpips we can directly use the pretrained model and feed the two tensors into the function.
 
@@ -409,6 +423,7 @@ In order to compute the loss functions, we need to define the reference and the 
   \centering
   \includegraphics[width=\textwidth]{autoencoder.png}
   \caption{The structure of Autoencoder}
+  \label{autoencoder}
 \end{figure}
 
 \section{Super-resolution}
@@ -434,16 +449,16 @@ In order to compute the loss functions, we need to define the reference and the 
 	\label{checkerboard}
 \end{figure}
 
-We adopt the same ImageTranformNetwork proposed by \citeauthor{johnson2016perceptual}, which is a fully convolutional network that has the same output tensor shape as the input. The network consists of three Convlayers, three UpsampleConvlayers and five residual blocks.\footnote{Notice that we do not use the deconvolutional layer in the UpsampleConvlayers as suggested in the paper\cite{odena2016deconvolution}, that deconvolutional layers will likely result into checkerboards artifacts due to the overlapping when doing the reverse convolution operations(see figure \ref{checkerboard}). So we prefer to fistly do the traditional upsampling either with Nearest-neighbor interpolation or with Bilinear interpolation then we apply the convlayer afterwards to obtain the expected upsampled size.}
+We adopt the same ImageTranformNetwork proposed by \citeauthor{johnson2016perceptual}, which is a fully convolutional network that has the same output tensor shape as the input. The network consists of three Convlayers, three UpsampleConvlayers and five residual blocks.\footnote{Notice that we do not use the deconvolutional layer in the UpsampleConvlayers as suggested in the paper\cite{odena2016deconvolution}, that deconvolutional layers will likely result into checkerboards artifacts due to the overlapping when doing the reverse convolution operations(see figure \ref{checkerboard}). So we prefer to fistly do the traditional upsampling either with Nearest-neighbor interpolation or with Bilinear interpolation then we apply the convlayer afterwards to obtain the expected up sampled size.}
 
-Since the outputs of our model is RGB images, which means the tensor values lie in the range of [0, 255], so we apply at the end of the last upsampling layer a sigmoid function and then multiply 256. In such way, we can ensure that our output tensor value won't exceed the range. According to the model structure, the input tensor and the output tensor should share the same shape. So before we feed the low resolution data to the model, we need to first do the upsampling with some interpolation methods(we choose bilinear here) to resize our input images to the expected high resolution, then feed them to the model. 
+Since the outputs of our model is RGB images, which means the tensor values lie in the range of [0, 255], so we apply at the end of the last upsampling layer a sigmoid function and then multiply by 256. In this way, we can ensure that our output tensor value won't exceed the range. According to the model structure, the input tensor and the output tensor should share the same shape. So before we feed the low resolution data to the model, we need to first do the upsampling with some interpolation methods(we choose bilinear here) to resize our input images to the expected high resolution, then feed them to the model. 
 
 \subsection{Application of loss functions}
-The training process of super-resolution is very similar to that in the autoencoder task. The only different part is that we in the autoencoder use the same training data as the reference data, however in the super-resolution we use the downresoluted images as the training data. In terms of applying loss function, we also need to replicate the channels to suit the input shape of certain loss functions. For more details of how to deploy such modification, please turn to the Section 5.1.2
+The training process of super-resolution is very similar to that in the autoencoder task. The only different part is that we in the autoencoder use the same training data as the reference data, however in the super-resolution we use the down sampled images as the training data. In terms of applying loss function, we also need to replicate the channels to suit the input shape of certain loss functions. For more details of how to deploy such modification, please turn to the Section 5.1.2
 
 
 \section{Solver in the Loop}
-After we have generated the training set and its down-sampled version, we can start the training. We will first cover the basics of the network and its training goal, then we will go into details of how to apply the loss function.
+After we generate the training set and its down-sampled version, we can start the training. We will first cover the basics of the network and its training goal, then we will go into details of how to apply the loss functions.
 \subsection{Network}
 The training network we used is called MarsMoon, which is the same network that \citeauthor{um2020sol} adopted in the his project(see figure \ref{marsmoon}) we can see that the number of channels for both input and output is 2. This is because the input is the staggered tensor of the velocity which has two directions one represents the y direction and the other represents the x direction. The output of the network is also a staggered tensor however it can not be directly addressed as the velocity but a correction of the velocity, which can be added to the velocity calculated on the lower domain, then the corrected velocity can be applied for the next simulation step. The reason why we do not train the output towards the velocity for the next simulation step is because we want to take advantage of the physical information stored in those tensors, if we should simply get the next velocity from passing the former velocity through the network, then we would not need to perform the physical simulation, which is very unstable. Thus, adding the trained correction to the physical simulation output of the former velocity would at least make sure that our simulation is performing on the right track. That means our consecutive steps of the simulation are based on valid physical simulation, which can not be ensured by purely passing through the neural network.
 \begin{figure}
@@ -816,7 +831,7 @@ We also test the karman flow data(see figure \ref{super karman}) from Solver in 
 		\includegraphics[scale=0.5]{superresolution/karman_lpips.png}
 		\caption{$Lpips$}
 	\end{subfigure}
-	\caption{karman flow images comparison}
+	\caption{Karman flow images reconstructions from super-resolution models trained by different metrics}
 	\label{super karman}
 \end{figure}
 The numerical evaluation is quite surprising(see figure \ref{super karman numeval}). Despite Lpips outputs have the closest color to the reference, it has the worst score over all the evaluations. LSiM achieves the best score in all evaluations. However intuitively, we can hardly tell the difference between the MSE, LSiM and VGG-16 outputs.
@@ -858,7 +873,7 @@ The numerical evaluation is quite surprising(see figure \ref{super karman numeva
 \end{figure}
 
 \subsection{Solver in the loop}
-After training lots of models on both buoyancy driven flow and the karman flow of different resolutions, we have following results. In terms of numerical evaluations, we compute the distance of various metrics(L1, L2, MSE, LSiM, SSIM, Lpips) between the simulation corrected by the models trained by different loss functions, and the down-sampled reference simulation. We compute the distance between each corresponding frames pair and compute their average as the result.
+After training lots of models on both buoyancy driven flow and the karman flow of different resolutions, we have following results. In terms of numerical evaluations, we compute the distance by various metrics(L1, L2, MSE, LSiM, SSIM, Lpips) between the simulation corrected by the models trained by different loss functions, and the down-sampled reference simulation. We compute the distance between each corresponding frames pair and compute their average as the result.
 
 \paragraph{Karman flow}
 From the comparisons from the figures, we can see that the source simulation(see figure \ref{sol karman high source}) deviates from the reference (see figure \ref{sol karman high ref}) after 1000 steps. Lpips (see figure \ref{sol karman high lpips}) obviously has the worst performance, the plume is shifting to the right and there are noticeable artifacts near the obstacle. MSE, LSiM and VGG-16(see figures \ref{sol karman high mse} , \ref{sol karman high lsim} , \ref{sol karman high vgg})  share similar outputs after step 1000.
@@ -1091,14 +1106,14 @@ The outputs are satisfying. We can see barely any artifacts from the outputs and
 		\includegraphics[scale=0.3]{timecost/low1499.png}
 		\caption{$t=1499$}
 	\end{subfigure}
-	\caption{Karman flow low simulation + SOL model + super-resolution model \href{https://github.com/w191444052/sol-data/blob/master/sol\%2Bsuperresolution/sol\%2Bsuperresolution_output.gif}{\textbf{gif here}}}
+	\caption{Karman flow lower-resolution simulation + SOL model + super-resolution model \href{https://github.com/w191444052/sol-data/blob/master/sol\%2Bsuperresolution/sol\%2Bsuperresolution_output.gif}{\textbf{gif here}}}
 	\label{timecost out}
 \end{figure}
 
 \section{Limitations}
 \paragraph{Autoencoder} We think the network we build for the autoencoder task is rather small and shallow. It only consists of 4 feature extraction layers, so the distance between using perceptual losses and traditional loss functions may not be explicitly revealed. We only choose to train the model that handles the gray scale images, while in more complicated use cases there could be fluid images with RGB channels. For such conditions we need to train a more complicated model.
 \paragraph{Super-resolution} When we use the data sets that consist all the density, velocity and pressure images, the model seems very hard to generalize for such data sets. We can notice lots of artifacts within the density reconstruction plumes. We might need to add some regularization to the network to let the model apply to the data sets with high variations. We also tested the RGB-channel version of the network. The outputs of the network still consist of some artifacts. We can see vaguely that the outputs are divided into 9 parts, we may need to redesign the network to eliminate such artifacts.
-\paragraph{Solver in the Loop}Due to the GPU memory limitation(we used a GTX 1080Ti with 11GiB of memory to train the SOL  model), we are unable to choose a higher multiple steps size to train the model.\footnote{The multiple steps size is the number of the consecutive frames we focus on in one training step. It's similar to batch size, the larger the multiple steps size is, the more GPU memory it requires}. We choose the multi step size in both buoyancy driven flow and karman flow as 8. \citeauthor{um2020sol} used some similar multi step size for karman flow, however 128 for the buoyancy driven flow. We think that the reason why our buoyancy driven flow is not working as expected may come from that we choose a too small multi step size.
+\paragraph{Solver in the Loop}Due to the GPU memory limitation(we used a GTX 1080Ti with 11GiB of memory to train the SOL  model), we are unable to choose a higher multiple steps size to train the model.\footnote{The multiple steps size is the number of the consecutive frames we focus on in one training step. It's similar to batch size, the larger the multiple steps size is, the more GPU memory it requires} We choose the multi step size in both buoyancy driven flow and karman flow as 8. \citeauthor{um2020sol} used some similar multiple steps sizes for karman flow, however 128 for the buoyancy driven flow. We think that the reason why our buoyancy driven flow is not working as expected may come from that we choose a too small multiple steps size.
 
 
 
@@ -1112,6 +1127,8 @@ We can try to extend the model of super-resolution and autoencoder to the RGB ch
 For the Solver in the Loop model, we can choose to upsample the model outputs and compare them with the reference instead of downsampling the reference to compare with the model outputs. In such way, we do not need to pad our low-resolution domain to suit the minimal input size of the LSiM model. Besides, we can consider all the 1500 simulation steps of karman flow and enlarge the simulation multi steps and data sets to train a more general model. We can also include more fluid simulation types(not just karman flow and buoyancy driven flow) to the data sets and train them on a more higher-resolution domain to see whether the distance between MSE and perceptual losses becomes bigger.
 
 Moreover we can try to compare the performance of perceptual losses in other tasks, e.g. inpaintings\cite{DBLP:journals/corr/abs-1712-03111}, style transfer for the fluids\cite{kim2020lagrangian} etc. Especially in \cite{kim2020lagrangian}, the data sets are fluids with RGB-channels. We can try out different perceptual loss functions for computing the loss of shapes and the loss of styles, which is similar to\cite{johnson2016perceptual}'s model architecture(see figure \ref{vgg-16-perceptual}).
+
+Using the super-resolution model + Solver in the Loop model to accelerate the numerical simulation is also a very interesting topic. The current version only supports very limited simulation types(karman flow). In order to add more generality to the models, we need to expand our datasets to include more numerical simulation data for training both the super-resolution model and the Solver in the Loop model. Further more we can expand such models to 3-D version. With the huge decrease of simulation time, we may be able to develop real-time Physics-based simulation in the future.
 \section{Summary}
 In this thesis, we successfully proved the advantage of using perceptual losses in some fluid simulation related tasks. However, in some tasks, using perceptual losses is not necessarily better than using traditional loss functions. There is no one dominant perceptual loss function for every task. For the super-resolution model(see figure \ref{super numeval}) on the smoke and liquid data sets, the VGG-16 demonstrates the best performance over all the 4 metrics. While for the same model on the karman flow data sets, LSiM achieves the best score(see figure \ref{super karman numeval}). 
 In the super-resolution task, we also notice that the distance between using MSE and perceptual losses is smaller when we train the model that handles gray scale images(see figure \ref{super density}) rather than RGB-channel images(see figure \ref{super rgb}). The similar result also appears in the Solver in the Loop task. After running tests on both the karman flow and buoyancy driven flow, we can see that the perceptual losses tend to perform better in more complicated conditions. Both for the karman flow(see figures \ref{sol karman high numeval} vs \ref{sol karman low numeval}) and buoyancy driven flow(see figures \ref{sol buoyancy high numeval} vs \ref{sol buoyancy low numeval}), the numerical distance between using perceptual losses and MSE is bigger when running the simulation on the higher domain. Similarly, if we compare the higher resolution simulation between karman flow and buoyancy driven flow(see figures \ref{sol karman high numeval} vs \ref{sol buoyancy high numeval}, \ref{sol karman low numeval} vs \ref{sol buoyancy low numeval}), we can tell that the numerical distance between using perceptual losses and MSE is bigger when running the buoyancy driven flow simulation. Despite the fact that some of the corrected simulations are not even better than the source simulation, we can still judge in terms of loss functions, that perceptual losses tend to perform better under more complicated conditions. 
@@ -1272,7 +1289,7 @@ In the super-resolution task, we also notice that the distance between using MSE
 		\includegraphics[scale=0.5]{karmanflow/lpips_density_001499.png}
 		\caption{$t=1499$}
 	\end{subfigure}
-	\caption{Karman flow simulation with Lpips on the 128*128 domain\href{https://github.com/w191444052/sol-data/blob/master/karman_high/lpips.gif}{\bf{gif here}}}
+	\caption{Karman flow simulation with Lpips on the 128*128 domain \href{https://github.com/w191444052/sol-data/blob/master/karman_high/lpips.gif}{\bf{gif here}}}
 	\label{sol karman high lpips}
 \end{figure}
 
@@ -1525,7 +1542,7 @@ In the super-resolution task, we also notice that the distance between using MSE
 		\includegraphics[scale=0.56]{buoyancy_test/dens_000249_lpips.png}
 		\caption{$t=250$}
 	\end{subfigure}
-	\caption{Buoyancy driven flow simulation trained with lpips on the 128*128 domain \href{https://github.com/w191444052/sol-data/blob/master/buoyancy_high/lpips.gif}{\bf{gif here}}}
+	\caption{Buoyancy driven flow simulation trained with Lpips on the 128*128 domain \href{https://github.com/w191444052/sol-data/blob/master/buoyancy_high/lpips.gif}{\bf{gif here}}}
 	\label{sol buoyancy high lpips}
 \end{figure}
 
