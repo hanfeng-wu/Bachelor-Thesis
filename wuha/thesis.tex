@@ -160,7 +160,7 @@ where $\nabla$ denotes the gradient, $\nabla\cdot$ denotes the divergence, $\vec
 The equation (1.1) is actually a transformation of the $\vec{F} = m\vec{a}$\cite{fluidnotes} and the equation (1.2) describes the incompressibility of the fluid. There are two ways to regard the fluid in the simulation, which are Lagrangian point of view and Eulerian point of  view. Lagrangian point view focuses on the behavior of the fluid parcels, while Eulerian point of view focuses on the velocity fields, pressure fields that vary in time and space. We prefer to use Lagrangian point of view because the existing NS-equations focus more on the physical properties of the fluid parcel rather than describing the mathematical properties of the field.  In order to adopt the Lagrangian point of view, we need a grid structure to store the properties of our fluid parcels.
 
 \subsection{Grid Stucture}
-The way of storing the velocity and the density is based on two different grid structure. We store the density in the center of each cell, we call it centered grid or scalar grid. However for storing the velocity, we sample them at the face centers of each cell\cite{doi:10.1063/1.1761178}, while the pressure is stored in the center of each grid. In such way we can more easily compute the inflow and outflow of each grid for each direction. As a trade off for such grid structure, the data format would be more complex than normal centered grid. We usually have to stack each velocity array of each dimension together and also adopt them individually in some computations(e.g. computing loss function in deep learning)
+The way of storing the velocity and the density is based on two different grid structure. We store the density in the center of each cell, we call it centered grid or scalar grid. However for storing the velocity, we sample them at the face centers of each cell\cite{doi:10.1063/1.1761178}, while the pressure is stored in the center of each grid. In such way we can more easily compute the inflow and outflow of each grid for each direction. As a trade off for such grid structure, the data format would be more complex than normal centered grid. We usually have to stack each velocity array of each dimension together and also adopt them individually in some computations(e.g. computing loss function in deep learning).
 
 \begin{figure}[h]
 \centering
@@ -181,7 +181,6 @@ The way of storing the velocity and the density is based on two different grid s
 	\ENDFOR
 \end{algorithmic}
 \end{algorithm}
-
 With the knowledge base of the NS-equation and grid structures we now need the advection algorithm to run the simulation. We adopt the semi-lagrangian advection algorithm. In the lagrangian point of view, if we want to compute the grid value of the n+1 time step of grid position $\vec{x_G}$, we should figure out which particle actually flows to the grid $\vec{x_G}$ from time step n. If we name the grid position of the particle as $\vec{x_P}$, then the new particle at time step n+1 in $\vec{x_G}$ should have the same physical property as the particle at time step n in $\vec{x_P}$
 
 \begin{figure}[h]
@@ -215,7 +214,7 @@ With the super-resolution model, we can upscale the low-resolution images to hig
 When we want to perform our fluid simulation on a lower-resolution domain to decrease the time cost, we always suffer from the numerical error comparing to the simulation running on the higher-resolution domain. It is reasonable because with the same initial state, the vector field on the higher domain has richer information than the one sampled in the lower domain. \citeauthor{um2020sol} developed a mechanisim to learn the difference between the 2 different domains to reduce the numerical error.  We use the simulation from a high-resolution domain as the ground truth and make another same simulation with a lower resolution to approach our reference.  
 
 
-
+%------- chapter 2 -------
 
 \chapter{Related Work}
 \paragraph{Perceptual losses related}The idea of jumping out of the traditional metrics based on $L^p$ norm has firstly begun by \cite{wang2004}, who developed the structure similarity index. Yet it was still not a perceptual loss and can not extract any deep features of the images. The situation has been improved by the discovery of CNN. CNNs are able to extract a lot of deep features, structures and patterns from the image datasets (for example in 2014 \cite{simonyan2014very} has proposed the VGG structure which achieved 92.7\% top-5 test accuracy in ImageNet), therefore more and more  works tend to use perceptual loss to train their models\cite{amirshahi2016, berardino2017, bosse2016, kang2014, kim2017}. In 2016 \cite{johnson2016perceptual} used intermediate layer comparison from the trained VGG-16 network to evaluate their model for both super-resolution task and style-transfer task.  in 2018 \cite{zhang2018perceptual} developed a new metric used for quality assessment as well as perceptual loss function. In 2020 \cite{kohl2020learning} proposed a new perceptual metric focusing on the numerical evaluation data.
@@ -223,7 +222,7 @@ When we want to perform our fluid simulation on a lower-resolution domain to dec
 
 
 
-%------- chapter 2 -------
+%------- chapter 3 -------
 
 \chapter{Metrics and Perceptual Losses}
 Perceptual loss functions are used when comparing two images. They are different from traditional loss functions. For instance, MSE or MAE only compute the low level pixel differences. Perceptual losses on the other hand, are normally forward networks trained for specific tasks. For example, VGG-16 network was trained for massive image classification, and LSiM was trained on smoke and fluid simulations. When adopting those perceptual loss networks, we can either compute the MSE loss between the intermediate layers of the trained network, or pass through the trained perceptual loss network depending on the original goal of the chosen network. These perceptual loss networks try to retrieve the high level differences between the images, hence will usually have a better training performance than the traditional loss functions.
@@ -265,7 +264,7 @@ With figure \ref{lsimcompare}, we can tell that the $L^2$ loss function consider
 \caption{The loss computed between two different plume images and the reference with LSiM and $L^2$ metrics. While the GT is the ground truth distance determined by the distance of the initial parameters in the data generation. }
 \label{lsimcompare}
 \end{figure}
-The LSiM itself is also a CNN-based metric, see figure \ref{lsim}. The input of the network must be two batches of images with 3 channels
+The LSiM itself is also a CNN-based metric, see figure \ref{lsim}. The input of the network must be two batches of images with 3 channels.
 \begin{figure}
 \centering
 \includegraphics[width=1.0\textwidth]{DistanceComputation.pdf}
@@ -454,7 +453,7 @@ We adopt the same ImageTranformNetwork proposed by \citeauthor{johnson2016percep
 Since the outputs of our model is RGB images, which means the tensor values lie in the range of [0, 255], so we apply at the end of the last upsampling layer a sigmoid function and then multiply by 256. In this way, we can ensure that our output tensor value won't exceed the range. According to the model structure, the input tensor and the output tensor should share the same shape. So before we feed the low resolution data to the model, we need to first do the upsampling with some interpolation methods(we choose bilinear here) to resize our input images to the expected high resolution, then feed them to the model. 
 
 \subsection{Application of loss functions}
-The training process of super-resolution is very similar to that in the autoencoder task. The only different part is that we in the autoencoder use the same training data as the reference data, however in the super-resolution we use the down sampled images as the training data. In terms of applying loss function, we also need to replicate the channels to suit the input shape of certain loss functions. For more details of how to deploy such modification, please turn to the Section 5.1.2
+The training process of super-resolution is very similar to that in the autoencoder task. The only different part is that we in the autoencoder use the same training data as the reference data, however in the super-resolution we use the down sampled images as the training data. In terms of applying loss function, we also need to replicate the channels to suit the input shape of certain loss functions. For more details of how to deploy such modification, please turn to the Section 5.1.2.
 
 
 \section{Solver in the Loop}
@@ -480,12 +479,12 @@ In karman flow simulation, we choose not to use the whole training set to train 
 \begin{subfigure}{0.4\textwidth}
   \centering
   \includegraphics[scale=1]{nonpad_karmanflow.png}
-  \caption{original simulation}
+  \caption{Original simulation}
 \end{subfigure}
 \begin{subfigure}{0.4\textwidth}
   \centering
   \includegraphics[scale=1]{pad_karmanflow.png}
-  \caption{padded simulation}
+  \caption{Padded simulation}
 \end{subfigure}
 \caption{Padding plume images to match the input size of LSiM model. However, with the same parameters, there are still some differences between the padded and original karman flow simulation due to the domain size difference.}
 \label{pad}
@@ -513,7 +512,7 @@ where F is the respective perceptual loss function. In this way, we are able to 
 
 
 
-%------- chapter 5 -------
+%------- chapter 6 -------
 
 \chapter{Results and Analysis}
 
@@ -614,7 +613,7 @@ where F is the respective perceptual loss function. In this way, we are able to 
 		\includegraphics[scale=0.5]{autoencoder/lpipseval.png}
 		\caption{Lpips evaluation}
 	\end{subfigure}
-	\caption{Numerical evaluation of each metric on the testset of autoencoder task}
+	\caption{Numerical evaluations of each metric on the testset of autoencoder task}
 	\label{autoencoder numeval}
 \end{figure}
 We train the autoencoder model on density, pressure and velocity data of smokes, here are some examples of the training outputs.(see figures \ref{autoencoder density outputs}, \ref{autoencoder pressure outputs}) The reference image as well as the training input is on the left side  while the rest are different model outputs trained by their respective losses. We can see that for every output, there are some artifacts on each side of the image. The reason might be that our autoencoder model is too simple so it does not provide enough feature extractors to extract and rebuild the features of the smoke images. MSE and LSiM in this case share similar performance, while Lpips provide a darker reconstruction than the others. The model trained by VGG-16 loss function has the best output. We can infer that from the rich information on the edges of the smoke images.
@@ -762,7 +761,7 @@ We train the autoencoder model on density, pressure and velocity data of smokes,
 		\includegraphics[scale=0.5]{superresolution/lpips.png}
 		\caption{Lpips evaluation}
 	\end{subfigure}
-	\caption{Numerical evaluation of each metrics on test set of the super-resolution task}
+	\caption{Numerical evaluations of each metric on test set of the super-resolution task}
 	\label{super numeval}
 \end{figure}
 We train our ImageTransformNet based super-resolution model on the data combined by smoke and liquid data. Both smoke and liquid data consist of density, velocity and pressure images. We sample them all in gray scale hence only one channel.
@@ -868,7 +867,7 @@ The numerical evaluation is quite surprising(see figure \ref{super karman numeva
 		\includegraphics[scale=0.48]{superresolution/karman_eval_lpips.png}
 		\caption{Lpips evaluation}
 	\end{subfigure}
-	\caption{Numerical evaluation of each metrics on test set of the super-resolution task trained on karman flow data}
+	\caption{Numerical evaluations of each metric on test set of the super-resolution task trained on karman flow data}
 	\label{super karman numeval}
 \end{figure}
 
@@ -878,7 +877,7 @@ After training lots of models on both buoyancy driven flow and the karman flow o
 \paragraph{Karman flow}
 From the comparisons from the figures, we can see that the source simulation(see figure \ref{sol karman high source}) deviates from the reference (see figure \ref{sol karman high ref}) after 1000 steps. Lpips (see figure \ref{sol karman high lpips}) obviously has the worst performance, the plume is shifting to the right and there are noticeable artifacts near the obstacle. MSE, LSiM and VGG-16(see figures \ref{sol karman high mse} , \ref{sol karman high lsim} , \ref{sol karman high vgg})  share similar outputs after step 1000.
 
-In our numerical evaluations(see figure \ref{sol karman high numeval}), we only compare the simulation frames after step 1000 with their reference frames. We didn't compare the whole 1500 steps because we believe that considering all steps is not suitable since the reference images of the training only come from the latter 500 simulation steps. In terms of L1, L2 and MSE comparisons, we can see all corrected models have better scores than the source simulation. In the other evaluations, LSiM achieves overall the best score, followed by the VGG-16. MSE is not better than the source simulation, which is deviated from \citeauthor{um2020sol}'s work. We think the deviation may result from that we didn't choose a large multiple steps size\footnote{The multiple steps size is the number of the consecutive frames we focus on in one training step. It's similar to batch size, the larger the multiple steps size is, the more GPU memory it requires}, or a large training epoch. Still we prove that LSiM or VGG-16 outperform MSE in terms of this specific task.
+In our numerical evaluations(see figure \ref{sol karman high numeval}), we only compare the simulation frames after step 1000 with their reference frames. We didn't compare the whole 1500 steps because we believe that considering all steps is not suitable since the reference images of the training only come from the latter 500 simulation steps. In terms of L1, L2 and MSE comparisons, we can see all corrected models have better scores than the source simulation. In the other evaluations, LSiM achieves overall the best score, followed by the VGG-16. MSE is not better than the source simulation, which is deviated from \citeauthor{um2020sol}'s work. We think the deviation may result from that we didn't choose a large multiple steps size\footnote{The multiple steps size is the number of the consecutive frames we focus on in one training step. It's similar to batch size, the larger the multiple steps size is, the more GPU memory it requires.}, or a large training epoch. Still we prove that LSiM or VGG-16 outperform MSE in terms of this specific task.
 
 
 
@@ -914,7 +913,7 @@ In our numerical evaluations(see figure \ref{sol karman high numeval}), we only 
 		\includegraphics[scale=0.49]{karmanflow/lpips.png}
 		\caption{Lpips evaluation}
 	\end{subfigure}
-	\caption{Numerical evaluation of each metrics on test set with the reference}
+	\caption{Karman flow numerical evaluations of each metric on test set with the reference on the 128*64 domain}
 	\label{sol karman high numeval}
 \end{figure}
 
@@ -955,7 +954,7 @@ We can see on a lower domain, Lpips metric outperform the others, while LSiM is 
 		\includegraphics[scale=0.49]{karman_low/numeval_lpips.png}
 		\caption{Lpips evaluation}
 	\end{subfigure}
-	\caption{Numerical evaluation of each metrics on test set with the reference on the 64*64 domain}
+	\caption{Karman flow numerical evaluations of each metric on test set with the reference on the 64*64 domain}
 	\label{sol karman low numeval}
 \end{figure}
 
@@ -997,7 +996,7 @@ For completeness we also turn to the buoyancy driven flow on the lower domain(64
 		\includegraphics[scale=0.48]{buoyancy_test/lpips.png}
 		\caption{Lpips evaluation}
 	\end{subfigure}
-	\caption{Numerical evaluation of each metrics on test set of buoyancy driven flow with the domain resolution of 128*128 with Renold's number=2.5e5}
+	\caption{Buoyancy driven flow numerical evaluations of each metric on test set with the domain resolution of 128*128}
 	\label{sol buoyancy high numeval}
 		\end{figure}
 	
@@ -1036,15 +1035,15 @@ For completeness we also turn to the buoyancy driven flow on the lower domain(64
 			\includegraphics[scale=0.49]{buoyancy_low/lpips_eval.png}
 			\caption{Lpips evaluation}
 		\end{subfigure}
-		\caption{Numerical evaluation of each metrics on test set with the reference on the 64*64 domain}
+		\caption{Buoyancy driven flow numerical evaluations of each metric on test set with the reference on the 64*64 domain}
 		\label{sol buoyancy low numeval}
 	\end{figure}
 
 \subsection{Time cost evaluation}
 In this evaluation we combine the SOL model and the super-resolution model for karman flow on the domain of 64*64. We want to demonstrate the time cost and the quality difference between
 \begin{itemize}
-	\item running  the pure physical simulation on the higher domain, without any deep learning models involved (see figure \ref{timecost ref})
-	\item running first the corrected physical simulation on the lower domain by the pretrained SOL model and then apply the super-resolution model to the same resolution of the higher domain (see figure \ref{timecost out})
+	\item running  the pure physical simulation on the higher-resolution domain(128*128), without any deep learning models involved (see figure \ref{timecost ref})
+	\item running first the corrected physical simulation on the lower-resolution domain(64*64) by the pretrained SOL model and then apply the super-resolution model to the same resolution of the higher domain(128*128) (see figure \ref{timecost out})
 \end{itemize}
 The outputs are satisfying. We can see barely any artifacts from the outputs and the simulation is similar to the reference. We average the time cost of generating the 2 simulations. We have 14 min 6 sec on average for generating 1500 images of the reference(see figure \ref{timecost ref}) and 4 min 23 sec for generating the second simulation(see figure \ref{timecost out}). The time cost reduced by 70\% if we choose to generate a corrected low-resolution simulation and adopt the super-resolution model rather than performing the pure physical simulation on the higher-resolution domain. Meanwhile, the outputs are similar in terms of both the quality and the shape of the plumes.  
 
@@ -1113,12 +1112,12 @@ The outputs are satisfying. We can see barely any artifacts from the outputs and
 \section{Limitations}
 \paragraph{Autoencoder} We think the network we build for the autoencoder task is rather small and shallow. It only consists of 4 feature extraction layers, so the distance between using perceptual losses and traditional loss functions may not be explicitly revealed. We only choose to train the model that handles the gray scale images, while in more complicated use cases there could be fluid images with RGB channels. For such conditions we need to train a more complicated model.
 \paragraph{Super-resolution} When we use the data sets that consist all the density, velocity and pressure images, the model seems very hard to generalize for such data sets. We can notice lots of artifacts within the density reconstruction plumes. We might need to add some regularization to the network to let the model apply to the data sets with high variations. We also tested the RGB-channel version of the network. The outputs of the network still consist of some artifacts. We can see vaguely that the outputs are divided into 9 parts, we may need to redesign the network to eliminate such artifacts.
-\paragraph{Solver in the Loop}Due to the GPU memory limitation(we used a GTX 1080Ti with 11GiB of memory to train the SOL  model), we are unable to choose a higher multiple steps size to train the model.\footnote{The multiple steps size is the number of the consecutive frames we focus on in one training step. It's similar to batch size, the larger the multiple steps size is, the more GPU memory it requires} We choose the multi step size in both buoyancy driven flow and karman flow as 8. \citeauthor{um2020sol} used some similar multiple steps sizes for karman flow, however 128 for the buoyancy driven flow. We think that the reason why our buoyancy driven flow is not working as expected may come from that we choose a too small multiple steps size.
+\paragraph{Solver in the Loop}Due to the GPU memory limitation(we used a GTX 1080Ti with 11GiB of memory to train the SOL  model), we are unable to choose a higher multiple steps size to train the model.\footnote{The multiple steps size is the number of the consecutive frames we focus on in one training step. It's similar to batch size, the larger the multiple steps size is, the more GPU memory it requires.} We choose the multi step size in both buoyancy driven flow and karman flow as 8. \citeauthor{um2020sol} used some similar multiple steps sizes for karman flow, however 128 for the buoyancy driven flow. We think that the reason why our buoyancy driven flow is not working as expected may come from that we choose a too small multiple steps size.
 
 
 
 
-%------- chapter 6 -------
+%------- chapter 7 -------
 
 \chapter{Conclusion}
 \section{Future work}
@@ -1227,7 +1226,7 @@ In the super-resolution task, we also notice that the distance between using MSE
 		\includegraphics[scale=0.5]{karmanflow/mse_density_001499.png}
 		\caption{$t=1499$}
 	\end{subfigure}
-	\caption{Karman flow simulation trained with MSE on the 128*128 domain \href{https://github.com/w191444052/sol-data/blob/master/karman_high/mse.gif}{\bf{gif here}}}
+	\caption{Karman flow corrected simulation trained with MSE on the 128*64 domain \href{https://github.com/w191444052/sol-data/blob/master/karman_high/mse.gif}{\bf{gif here}}}
 	\label{sol karman high mse}
 \end{figure}
 
@@ -1258,7 +1257,7 @@ In the super-resolution task, we also notice that the distance between using MSE
 		\includegraphics[scale=0.5]{karmanflow/lsim_density_001499.png}
 		\caption{$t=1499$}
 	\end{subfigure}
-	\caption{Karman flow simulation trained with LSiM on the 128*128 domain \href{https://github.com/w191444052/sol-data/blob/master/karman_high/lsim.gif}{\bf{gif here}}}
+	\caption{Karman flow corrected simulation trained with LSiM on the 128*64 domain \href{https://github.com/w191444052/sol-data/blob/master/karman_high/lsim.gif}{\bf{gif here}}}
 	\label{sol karman high lsim}
 \end{figure}
 
@@ -1289,7 +1288,7 @@ In the super-resolution task, we also notice that the distance between using MSE
 		\includegraphics[scale=0.5]{karmanflow/lpips_density_001499.png}
 		\caption{$t=1499$}
 	\end{subfigure}
-	\caption{Karman flow simulation with Lpips on the 128*128 domain \href{https://github.com/w191444052/sol-data/blob/master/karman_high/lpips.gif}{\bf{gif here}}}
+	\caption{Karman flow corrected simulation trained with Lpips on the 128*64 domain \href{https://github.com/w191444052/sol-data/blob/master/karman_high/lpips.gif}{\bf{gif here}}}
 	\label{sol karman high lpips}
 \end{figure}
 
@@ -1320,7 +1319,7 @@ In the super-resolution task, we also notice that the distance between using MSE
 		\includegraphics[scale=0.5]{karmanflow/vgg_density_001499.png}
 		\caption{$t=1499$}
 	\end{subfigure}
-	\caption{Karman flow simulation trained with VGG-16 on the 128*128 domain \href{https://github.com/w191444052/sol-data/blob/master/karman_high/vgg.gif}{\bf{gif here}}}
+	\caption{Karman flow corrected simulation trained with VGG-16 on the 128*64 domain \href{https://github.com/w191444052/sol-data/blob/master/karman_high/vgg.gif}{\bf{gif here}}}
 	\label{sol karman high vgg}
 \end{figure}
 
@@ -1356,7 +1355,7 @@ In the super-resolution task, we also notice that the distance between using MSE
 		\includegraphics[scale=0.5]{karman_low/lpips}
 		\caption{Lpips}
 	\end{subfigure}
-	\caption{Karman flow simulation trained with each metric on the 64*64 domain comparing with the reference \href{https://github.com/w191444052/sol-data/tree/master/karman_low}{\bf{all gifs here}}}
+	\caption{Karman flow corrected simulation trained with each loss on the 64*64 domain comparing with the reference \href{https://github.com/w191444052/sol-data/tree/master/karman_low}{\bf{all gifs here}}}
 	\label{sol karman low}
 \end{figure}
 
@@ -1449,7 +1448,7 @@ In the super-resolution task, we also notice that the distance between using MSE
 		\includegraphics[scale=0.56]{buoyancy_test/dens_000249_lsim.png}
 		\caption{$t=250$}
 	\end{subfigure}
-	\caption{buoyancy driven flow simulation trained with LSiM on the 128*128 domain \href{https://github.com/w191444052/sol-data/blob/master/buoyancy_high/lsim.gif}{\bf{gif here}}}
+	\caption{Buoyancy driven flow corrected simulation trained with LSiM on the 128*128 domain \href{https://github.com/w191444052/sol-data/blob/master/buoyancy_high/lsim.gif}{\bf{gif here}}}
 	\label{sol buoyancy high lsim}
 \end{figure}
 
@@ -1480,7 +1479,7 @@ In the super-resolution task, we also notice that the distance between using MSE
 		\includegraphics[scale=0.56]{buoyancy_test/dens_000249_mse.png}
 		\caption{$t=250$}
 	\end{subfigure}
-	\caption{Buoyancy driven flow simulation trained with MSE on the 128*128 domain \href{https://github.com/w191444052/sol-data/blob/master/buoyancy_high/mse.gif}{\bf{gif here}}}
+	\caption{Buoyancy driven flow corrected simulation trained with MSE on the 128*128 domain \href{https://github.com/w191444052/sol-data/blob/master/buoyancy_high/mse.gif}{\bf{gif here}}}
 	\label{sol buoyancy high mse}
 \end{figure}
 
@@ -1511,7 +1510,7 @@ In the super-resolution task, we also notice that the distance between using MSE
 		\includegraphics[scale=0.56]{buoyancy_test/dens_000249_vgg.png}
 		\caption{$t=250$}
 	\end{subfigure}
-	\caption{Buoyancy driven flow simulation trained with VGG-16 on the 128*128 domain \href{https://github.com/w191444052/sol-data/blob/master/buoyancy_high/vgg.gif}{\bf{gif here}}}
+	\caption{Buoyancy driven flow corrected simulation trained with VGG-16 on the 128*128 domain \href{https://github.com/w191444052/sol-data/blob/master/buoyancy_high/vgg.gif}{\bf{gif here}}}
 	\label{sol buoyancy high vgg}
 \end{figure}
 
@@ -1542,7 +1541,7 @@ In the super-resolution task, we also notice that the distance between using MSE
 		\includegraphics[scale=0.56]{buoyancy_test/dens_000249_lpips.png}
 		\caption{$t=250$}
 	\end{subfigure}
-	\caption{Buoyancy driven flow simulation trained with Lpips on the 128*128 domain \href{https://github.com/w191444052/sol-data/blob/master/buoyancy_high/lpips.gif}{\bf{gif here}}}
+	\caption{Buoyancy driven flow corrected simulation trained with Lpips on the 128*128 domain \href{https://github.com/w191444052/sol-data/blob/master/buoyancy_high/lpips.gif}{\bf{gif here}}}
 	\label{sol buoyancy high lpips}
 \end{figure}
 
@@ -1578,7 +1577,7 @@ In the super-resolution task, we also notice that the distance between using MSE
 		\includegraphics[scale=0.5]{buoyancy_low/lpips}
 		\caption{Lpips at $t=149$}
 	\end{subfigure}
-	\caption{Buoyancy driven flow simulation trained with each metric on the 64*64 domain comparing with the reference and the source \href{https://github.com/w191444052/sol-data/tree/master/buoyancy_low}{\bf{all gifs here}}}
+	\caption{Buoyancy driven flow corrected simulation trained with each metric on the 64*64 domain comparing with the reference and the source \href{https://github.com/w191444052/sol-data/tree/master/buoyancy_low}{\bf{all gifs here}}}
 	\label{sol buoyancy low}
 \end{figure}
 
